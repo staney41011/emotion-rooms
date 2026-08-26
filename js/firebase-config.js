@@ -1,12 +1,11 @@
 // Firebase Web App 設定。
-// 尚未設定時，網站會自動維持 Demo 模式。
-// 完成 Firebase Console 的 Web App 註冊後，把官方提供的 firebaseConfig 貼到這裡。
+// 這些欄位會隨前端程式公開；真正的資料存取安全由 Realtime Database Rules 控制。
 export const firebaseConfig = {
-  apiKey: '',
-  authDomain: '',
-  databaseURL: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: ''
+  apiKey: 'AIzaSyAA8fhV_T_BI4poOaV6fHcqAQB-q56QBhE',
+  authDomain: 'emotion-rooms.firebaseapp.com',
+  databaseURL: 'https://emotion-rooms-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'emotion-rooms',
+  storageBucket: 'emotion-rooms.firebasestorage.app',
+  messagingSenderId: '366955281273',
+  appId: '1:366955281273:web:d888d1886a170d4e608da8'
 };
