@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>班員輸入｜情緒包廂</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="shell" style="max-width:820px">
+    <div class="topbar"><a class="back-link" href="index.html">← 回首頁</a><span class="small-note">班員輸入</span></div>
+    <section class="panel" id="roomStep">
+      <div class="eyebrow">STEP 1</div><h1 style="font-size:clamp(2rem,7vw,3.2rem)">你剛才在哪一間包廂？</h1>
+      <p class="lead">選擇對應的包廂，再留下你真正出現的感覺。沒有標準答案。</p>
+      <div class="room-grid" id="roomGrid"></div>
+    </section>
+    <section class="panel" id="inputStep" hidden>
+      <button class="back-link" id="backToRooms" type="button">← 重新選擇包廂</button>
+      <div class="room-head" id="roomHead"></div>
+      <form id="emotionForm">
+        <label class="form-label">剛才最明顯的情緒是？ <span class="small-note">最多 3 個詞</span></label>
+        <div class="word-row">
+          <input class="input emotion-input" maxlength="12" placeholder="例如：緊張">
+          <input class="input emotion-input" maxlength="12" placeholder="例如：不甘心">
+          <input class="input emotion-input" maxlength="12" placeholder="例如：想逃">
+        </div>
+        <div class="chips" id="exampleChips"></div>
+        <label class="form-label" for="comment">還想說什麼嗎？ <span class="small-note">選填</span></label>
+        <textarea id="comment" maxlength="180" placeholder="例如：我原本以為自己只是沒耐性，後來發現其實是很怕做不好。"></textarea>
+        <div class="alert">目前是 Demo 資料模式：同一台裝置的不同分頁可以即時同步；接上 Firebase 後，班員手機才會真正同步到投影電腦。</div>
+        <div class="btn-row"><button class="btn primary" type="submit">送出我的情緒</button></div>
+      </form>
+      <div class="success" id="successBox"><div class="big">✓</div><h2>收到你的情緒了</h2><p>不用急著把它變好，能夠看見它，就已經開始理解自己。</p><button class="btn soft" id="submitAgain" type="button">再填一間包廂</button></div>
+    </section>
+  </main>
+  <script type="module" src="js/student.js"></script>
+</body>
+</html>
