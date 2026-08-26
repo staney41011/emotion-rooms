@@ -1,12 +1,46 @@
+import { firebaseConfig } from './firebase-config.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue,
+  get,
+  set,
+  remove
+} from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js';
+
 const STORE_KEY = 'emotionRoomsDemoV1';
 const CHANNEL_NAME = 'emotionRoomsDemoChannel';
+const ROOT_PATH = 'emotionRooms/v1';
 const channel = 'BroadcastChannel' in window ? new BroadcastChannel(CHANNEL_NAME) : null;
+const subscribers = new Set();
 
 function emptyState() {
   return { submissions: {}, locked: false, updatedAt: Date.now() };
 }
 
-function readState() {
+function isFirebaseConfigured() {
+  return Boolean(
+    firebaseConfig &&
+    firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.databaseURL &&
+    firebaseConfig.appId
+  );
+}
+
+const firebaseEnabled = isFirebaseConfigured();
+let database = null;
+let firebaseStarted = false;
+let firebaseCache = emptyState();
+
+if (firebaseEnabled) {
+  const app = initializeApp(firebaseConfig);
+  database = getDatabase(app);
+}
+
+function readDemoState() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     return raw ? { ...emptyState(), ...JSON.parse(raw) } : emptyState();
@@ -15,88 +49,171 @@ function readState() {
   }
 }
 
-function writeState(state) {
+function writeDemoState(state) {
   state.updatedAt = Date.now();
   localStorage.setItem(STORE_KEY, JSON.stringify(state));
   channel?.postMessage({ type: 'changed', at: state.updatedAt });
 }
 
-function emitLocal() {
-  window.dispatchEvent(new CustomEvent('emotion-data-changed'));
+function currentState() {
+  return firebaseEnabled ? firebaseCache : readDemoState();
 }
 
-function notify(state) {
-  writeState(state);
-  emitLocal();
+function notifySubscribers() {
+  subscribers.forEach((callback) => callback(currentState()));
+  if (!firebaseEnabled) {
+    window.dispatchEvent(new CustomEvent('emotion-data-changed'));
+  }
+}
+
+function normalizeFirebaseState(raw) {
+  const source = raw || {};
+  const normalized = emptyState();
+  normalized.locked = !!source.locked;
+  normalized.updatedAt = source.updatedAt || Date.now();
+  const submissions = source.submissions || {};
+
+  Object.entries(submissions).forEach(([roomId, records]) => {
+    normalized.submissions[roomId] = Object.entries(records || {}).map(([id, item]) => ({
+      id,
+      roomId,
+      words: Array.isArray(item?.words) ? item.words : Object.values(item?.words || {}),
+      comment: item?.comment || '',
+      createdAt: Number(item?.createdAt || 0)
+    }));
+  });
+
+  return normalized;
+}
+
+function startFirebaseSubscription() {
+  if (!firebaseEnabled || firebaseStarted) return;
+  firebaseStarted = true;
+  onValue(
+    ref(database, ROOT_PATH),
+    (snapshot) => {
+      firebaseCache = normalizeFirebaseState(snapshot.val());
+      notifySubscribers();
+    },
+    (error) => {
+      console.error('Firebase Realtime Database subscription failed:', error);
+    }
+  );
+}
+
+function makeSubmission(roomId, payload, id = null) {
+  return {
+    ...(id ? { id } : {}),
+    roomId,
+    words: payload.words.map((w) => w.trim()).filter(Boolean).slice(0, 3),
+    comment: (payload.comment || '').trim().slice(0, 180),
+    createdAt: Date.now()
+  };
+}
+
+function getRoomList(state, roomId) {
+  return [...(state.submissions[roomId] || [])].sort((a, b) => b.createdAt - a.createdAt);
+}
+
+function firebaseAdminMessage(error) {
+  if (error?.code === 'PERMISSION_DENIED' || error?.code === 'permission-denied') {
+    return new Error('Firebase 已連線，但講師管理權限尚未設定。下一步接管理員登入後即可使用此功能。');
+  }
+  return error;
 }
 
 export const dataService = {
-  mode: 'demo',
+  mode: firebaseEnabled ? 'firebase' : 'demo',
 
   async submit(roomId, payload) {
-    const state = readState();
+    if (firebaseEnabled) {
+      const lockSnapshot = await get(ref(database, `${ROOT_PATH}/locked`));
+      if (lockSnapshot.val() === true) throw new Error('目前已暫停投稿');
+      const submission = makeSubmission(roomId, payload);
+      await push(ref(database, `${ROOT_PATH}/submissions/${roomId}`), submission);
+      return;
+    }
+
+    const state = readDemoState();
     if (state.locked) throw new Error('目前已暫停投稿');
     const list = state.submissions[roomId] || [];
-    list.push({
-      id: crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`,
-      roomId,
-      words: payload.words.map((w) => w.trim()).filter(Boolean).slice(0, 3),
-      comment: (payload.comment || '').trim().slice(0, 180),
-      createdAt: Date.now()
-    });
+    list.push(makeSubmission(roomId, payload, crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`));
     state.submissions[roomId] = list;
-    notify(state);
+    writeDemoState(state);
+    notifySubscribers();
   },
 
   getSubmissions(roomId) {
-    const state = readState();
-    return [...(state.submissions[roomId] || [])].sort((a, b) => b.createdAt - a.createdAt);
+    return getRoomList(currentState(), roomId);
   },
 
   getAllSubmissions() {
-    const state = readState();
-    return Object.values(state.submissions).flat().sort((a, b) => b.createdAt - a.createdAt);
+    return Object.values(currentState().submissions).flat().sort((a, b) => b.createdAt - a.createdAt);
   },
 
   getStats() {
-    const state = readState();
     const stats = {};
-    Object.entries(state.submissions).forEach(([roomId, list]) => { stats[roomId] = list.length; });
+    Object.entries(currentState().submissions).forEach(([roomId, list]) => {
+      stats[roomId] = list.length;
+    });
     return stats;
   },
 
   isLocked() {
-    return !!readState().locked;
+    return !!currentState().locked;
   },
 
-  setLocked(locked) {
-    const state = readState();
+  async setLocked(locked) {
+    if (firebaseEnabled) {
+      try {
+        await set(ref(database, `${ROOT_PATH}/locked`), !!locked);
+      } catch (error) {
+        throw firebaseAdminMessage(error);
+      }
+      return;
+    }
+    const state = readDemoState();
     state.locked = !!locked;
-    notify(state);
+    writeDemoState(state);
+    notifySubscribers();
   },
 
-  clearRoom(roomId) {
-    const state = readState();
+  async clearRoom(roomId) {
+    if (firebaseEnabled) {
+      try {
+        await remove(ref(database, `${ROOT_PATH}/submissions/${roomId}`));
+      } catch (error) {
+        throw firebaseAdminMessage(error);
+      }
+      return;
+    }
+    const state = readDemoState();
     delete state.submissions[roomId];
-    notify(state);
+    writeDemoState(state);
+    notifySubscribers();
   },
 
-  clearAll() {
+  async clearAll() {
+    if (firebaseEnabled) {
+      try {
+        await remove(ref(database, `${ROOT_PATH}/submissions`));
+      } catch (error) {
+        throw firebaseAdminMessage(error);
+      }
+      return;
+    }
     const state = emptyState();
-    writeState(state);
-    emitLocal();
+    writeDemoState(state);
+    notifySubscribers();
   },
 
-  seedDemo(roomId, words) {
-    const state = readState();
-    const list = state.submissions[roomId] || [];
+  async seedDemo(roomId, words) {
     const sample = words.length ? words : ['緊張', '期待', '不安', '開心'];
     const generated = [];
     sample.forEach((word, index) => {
       const repeats = Math.max(1, 7 - Math.floor(index / 2));
       for (let i = 0; i < repeats; i += 1) {
         generated.push({
-          id: `demo-${roomId}-${Date.now()}-${index}-${i}`,
           roomId,
           words: [word],
           comment: i === 0 ? `示範留言：${word}` : '',
@@ -104,17 +221,39 @@ export const dataService = {
         });
       }
     });
-    state.submissions[roomId] = [...list, ...generated];
-    notify(state);
+
+    if (firebaseEnabled) {
+      await Promise.all(generated.map((item) => push(ref(database, `${ROOT_PATH}/submissions/${roomId}`), item)));
+      return;
+    }
+
+    const state = readDemoState();
+    const list = state.submissions[roomId] || [];
+    state.submissions[roomId] = [
+      ...list,
+      ...generated.map((item, index) => ({ ...item, id: `demo-${roomId}-${Date.now()}-${index}` }))
+    ];
+    writeDemoState(state);
+    notifySubscribers();
   },
 
   subscribe(callback) {
-    const handler = () => callback(readState());
+    subscribers.add(callback);
+
+    if (firebaseEnabled) {
+      startFirebaseSubscription();
+      callback(firebaseCache);
+      return () => subscribers.delete(callback);
+    }
+
+    const handler = () => callback(readDemoState());
     window.addEventListener('storage', handler);
     window.addEventListener('emotion-data-changed', handler);
     if (channel) channel.addEventListener('message', handler);
-    callback(readState());
+    callback(readDemoState());
+
     return () => {
+      subscribers.delete(callback);
       window.removeEventListener('storage', handler);
       window.removeEventListener('emotion-data-changed', handler);
       if (channel) channel.removeEventListener('message', handler);
