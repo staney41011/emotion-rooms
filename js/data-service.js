@@ -10,6 +10,11 @@ import {
   remove,
   update
 } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js';
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
 
 const STORE_KEY = 'emotionRoomsDemoV1';
 const CHANNEL_NAME = 'emotionRoomsDemoChannel';
@@ -33,12 +38,15 @@ function isFirebaseConfigured() {
 
 const firebaseEnabled = isFirebaseConfigured();
 let database = null;
+let auth = null;
+let authPromise = null;
 let firebaseStarted = false;
 let firebaseCache = emptyState();
 
 if (firebaseEnabled) {
   const app = initializeApp(firebaseConfig);
   database = getDatabase(app);
+  auth = getAuth(app);
 }
 
 function readDemoState() {
@@ -120,6 +128,53 @@ function getRoomList(state, roomId) {
   return [...(state.submissions[roomId] || [])].sort((a, b) => b.createdAt - a.createdAt);
 }
 
+function authErrorMessage(error) {
+  if (error?.code === 'auth/operation-not-allowed') {
+    return new Error('Firebase 已連線，但 Anonymous Authentication 尚未啟用。請到 Firebase Authentication → Sign-in method 開啟 Anonymous。');
+  }
+  if (error?.code === 'auth/network-request-failed') {
+    return new Error('目前無法連線 Firebase，請檢查網路後再試。');
+  }
+  return error;
+}
+
+function ensureStudentAuth() {
+  if (!firebaseEnabled) return Promise.resolve(null);
+  if (auth?.currentUser) return Promise.resolve(auth.currentUser);
+  if (authPromise) return authPromise;
+
+  authPromise = new Promise((resolve, reject) => {
+    let settled = false;
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        if (!user || settled) return;
+        settled = true;
+        unsubscribe();
+        resolve(user);
+      },
+      (error) => {
+        if (settled) return;
+        settled = true;
+        unsubscribe();
+        reject(authErrorMessage(error));
+      }
+    );
+
+    signInAnonymously(auth).catch((error) => {
+      if (settled) return;
+      settled = true;
+      unsubscribe();
+      reject(authErrorMessage(error));
+    });
+  }).catch((error) => {
+    authPromise = null;
+    throw error;
+  });
+
+  return authPromise;
+}
+
 function firebaseAdminMessage(error) {
   if (error?.code === 'PERMISSION_DENIED' || error?.code === 'permission-denied') {
     return new Error('Firebase 已連線，但講師管理權限尚未設定。下一步接管理員登入後即可使用此功能。');
@@ -132,6 +187,8 @@ export const dataService = {
 
   async submit(roomId, payload) {
     if (firebaseEnabled) {
+      await ensureStudentAuth();
+
       const lockSnapshot = await get(ref(database, `${ROOT_PATH}/locked`));
       if (lockSnapshot.val() === true) throw new Error('目前已暫停投稿');
 
