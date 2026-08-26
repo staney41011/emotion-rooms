@@ -7,7 +7,8 @@ import {
   onValue,
   get,
   set,
-  remove
+  remove,
+  update
 } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js';
 
 const STORE_KEY = 'emotionRoomsDemoV1';
@@ -66,38 +67,42 @@ function notifySubscribers() {
   }
 }
 
-function normalizeFirebaseState(raw) {
-  const source = raw || {};
-  const normalized = emptyState();
-  normalized.locked = !!source.locked;
-  normalized.updatedAt = source.updatedAt || Date.now();
-  const submissions = source.submissions || {};
-
-  Object.entries(submissions).forEach(([roomId, records]) => {
-    normalized.submissions[roomId] = Object.entries(records || {}).map(([id, item]) => ({
+function normalizePublicWords(raw) {
+  const submissions = {};
+  Object.entries(raw || {}).forEach(([roomId, records]) => {
+    submissions[roomId] = Object.entries(records || {}).map(([id, item]) => ({
       id,
       roomId,
       words: Array.isArray(item?.words) ? item.words : Object.values(item?.words || {}),
-      comment: item?.comment || '',
+      comment: '',
       createdAt: Number(item?.createdAt || 0)
     }));
   });
-
-  return normalized;
+  return submissions;
 }
 
 function startFirebaseSubscription() {
   if (!firebaseEnabled || firebaseStarted) return;
   firebaseStarted = true;
+
   onValue(
-    ref(database, ROOT_PATH),
+    ref(database, `${ROOT_PATH}/publicWords`),
     (snapshot) => {
-      firebaseCache = normalizeFirebaseState(snapshot.val());
+      firebaseCache.submissions = normalizePublicWords(snapshot.val());
+      firebaseCache.updatedAt = Date.now();
       notifySubscribers();
     },
-    (error) => {
-      console.error('Firebase Realtime Database subscription failed:', error);
-    }
+    (error) => console.error('Firebase public word subscription failed:', error)
+  );
+
+  onValue(
+    ref(database, `${ROOT_PATH}/locked`),
+    (snapshot) => {
+      firebaseCache.locked = snapshot.val() === true;
+      firebaseCache.updatedAt = Date.now();
+      notifySubscribers();
+    },
+    (error) => console.error('Firebase lock subscription failed:', error)
   );
 }
 
@@ -129,8 +134,24 @@ export const dataService = {
     if (firebaseEnabled) {
       const lockSnapshot = await get(ref(database, `${ROOT_PATH}/locked`));
       if (lockSnapshot.val() === true) throw new Error('目前已暫停投稿');
+
       const submission = makeSubmission(roomId, payload);
-      await push(ref(database, `${ROOT_PATH}/submissions/${roomId}`), submission);
+      const newRef = push(ref(database, `${ROOT_PATH}/publicWords/${roomId}`));
+      const id = newRef.key;
+      if (!id) throw new Error('無法建立投稿編號，請再試一次。');
+
+      await update(ref(database, ROOT_PATH), {
+        [`publicWords/${roomId}/${id}`]: {
+          roomId,
+          words: submission.words,
+          createdAt: submission.createdAt
+        },
+        [`privateComments/${roomId}/${id}`]: {
+          roomId,
+          comment: submission.comment,
+          createdAt: submission.createdAt
+        }
+      });
       return;
     }
 
@@ -181,7 +202,10 @@ export const dataService = {
   async clearRoom(roomId) {
     if (firebaseEnabled) {
       try {
-        await remove(ref(database, `${ROOT_PATH}/submissions/${roomId}`));
+        await update(ref(database, ROOT_PATH), {
+          [`publicWords/${roomId}`]: null,
+          [`privateComments/${roomId}`]: null
+        });
       } catch (error) {
         throw firebaseAdminMessage(error);
       }
@@ -196,7 +220,8 @@ export const dataService = {
   async clearAll() {
     if (firebaseEnabled) {
       try {
-        await remove(ref(database, `${ROOT_PATH}/submissions`));
+        await remove(ref(database, `${ROOT_PATH}/publicWords`));
+        await remove(ref(database, `${ROOT_PATH}/privateComments`));
       } catch (error) {
         throw firebaseAdminMessage(error);
       }
@@ -208,6 +233,10 @@ export const dataService = {
   },
 
   async seedDemo(roomId, words) {
+    if (firebaseEnabled) {
+      throw new Error('正式 Firebase 模式不提供 Demo 資料寫入。');
+    }
+
     const sample = words.length ? words : ['緊張', '期待', '不安', '開心'];
     const generated = [];
     sample.forEach((word, index) => {
@@ -221,11 +250,6 @@ export const dataService = {
         });
       }
     });
-
-    if (firebaseEnabled) {
-      await Promise.all(generated.map((item) => push(ref(database, `${ROOT_PATH}/submissions/${roomId}`), item)));
-      return;
-    }
 
     const state = readDemoState();
     const list = state.submissions[roomId] || [];
