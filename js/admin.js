@@ -6,6 +6,7 @@ const list = document.querySelector('#submissionList');
 const filter = document.querySelector('#roomFilter');
 const actionRoom = document.querySelector('#actionRoom');
 const lockBtn = document.querySelector('#lockBtn');
+const seedRoomBtn = document.querySelector('#seedRoomBtn');
 
 filter.innerHTML = '<option value="all">全部包廂</option>' + ROOMS.map(r => `<option value="${r.id}">${r.number}. ${r.name}</option>`).join('');
 actionRoom.innerHTML = ROOMS.map(r => `<option value="${r.id}">${r.number}. ${r.name}</option>`).join('');
@@ -23,9 +24,47 @@ function render() {
 }
 
 function escapeHtml(text) { return text.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+function showError(error) { alert(error?.message || '操作失敗，請稍後再試。'); }
+
 filter.addEventListener('change', render);
-lockBtn.addEventListener('click', () => dataService.setLocked(!dataService.isLocked()));
-document.querySelector('#seedRoomBtn').addEventListener('click', () => { const room = getRoom(actionRoom.value); dataService.seedDemo(room.id, room.examples); });
-document.querySelector('#clearRoomBtn').addEventListener('click', () => { if (confirm('確定清空這間包廂的 Demo 投稿？')) dataService.clearRoom(actionRoom.value); });
-document.querySelector('#clearAllBtn').addEventListener('click', () => { if (confirm('確定清空全部 Demo 投稿？')) dataService.clearAll(); });
-dataService.subscribe(render); render();
+lockBtn.addEventListener('click', async () => {
+  try {
+    await dataService.setLocked(!dataService.isLocked());
+  } catch (error) {
+    showError(error);
+  }
+});
+
+if (dataService.mode === 'firebase' && seedRoomBtn) {
+  seedRoomBtn.hidden = true;
+}
+
+seedRoomBtn?.addEventListener('click', async () => {
+  const room = getRoom(actionRoom.value);
+  try {
+    await dataService.seedDemo(room.id, room.examples);
+  } catch (error) {
+    showError(error);
+  }
+});
+
+document.querySelector('#clearRoomBtn').addEventListener('click', async () => {
+  if (!confirm('確定清空這間包廂的投稿？')) return;
+  try {
+    await dataService.clearRoom(actionRoom.value);
+  } catch (error) {
+    showError(error);
+  }
+});
+
+document.querySelector('#clearAllBtn').addEventListener('click', async () => {
+  if (!confirm('確定清空全部投稿？')) return;
+  try {
+    await dataService.clearAll();
+  } catch (error) {
+    showError(error);
+  }
+});
+
+dataService.subscribe(render);
+render();
