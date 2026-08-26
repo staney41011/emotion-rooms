@@ -5,6 +5,7 @@ const tabs = document.querySelector('#roomTabs');
 const cloud = document.querySelector('#wordCloud');
 const title = document.querySelector('#cloudTitle');
 const count = document.querySelector('#submissionCount');
+const seedBtn = document.querySelector('#seedBtn');
 let currentId = new URLSearchParams(location.search).get('room') || ROOMS[0].id;
 
 ROOMS.forEach((room) => {
@@ -43,7 +44,18 @@ function render() {
   });
 }
 
+if (dataService.mode === 'firebase' && seedBtn) {
+  seedBtn.hidden = true;
+}
+
 dataService.subscribe(render);
-document.querySelector('#seedBtn').addEventListener('click', () => { const room = getRoom(currentId); dataService.seedDemo(currentId, room.examples); });
+seedBtn?.addEventListener('click', async () => {
+  const room = getRoom(currentId);
+  try {
+    await dataService.seedDemo(currentId, room.examples);
+  } catch (error) {
+    alert(error.message || '無法載入示範資料');
+  }
+});
 document.querySelector('#fullscreenBtn').addEventListener('click', () => document.documentElement.requestFullscreen?.());
 render();
