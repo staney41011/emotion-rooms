@@ -2,16 +2,17 @@
   "rules": {
     "emotionRooms": {
       "v1": {
-        ".read": true,
         "locked": {
+          ".read": true,
           ".write": false,
           ".validate": "newData.isBoolean()"
         },
-        "submissions": {
+        "publicWords": {
+          ".read": true,
           "$roomId": {
             "$submissionId": {
               ".write": "!data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() !== true",
-              ".validate": "newData.hasChildren(['roomId','words','comment','createdAt']) && newData.child('roomId').isString() && newData.child('roomId').val() === $roomId && newData.child('words').hasChildren(['0']) && newData.child('createdAt').isNumber()",
+              ".validate": "newData.hasChildren(['roomId','words','createdAt']) && newData.child('roomId').val() === $roomId && newData.child('words').hasChildren(['0']) && newData.child('createdAt').isNumber()",
               "roomId": {
                 ".validate": "newData.isString() && newData.val().length <= 40"
               },
@@ -20,6 +21,24 @@
                 "$index": {
                   ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
                 }
+              },
+              "createdAt": {
+                ".validate": "newData.isNumber()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          }
+        },
+        "privateComments": {
+          ".read": false,
+          "$roomId": {
+            "$submissionId": {
+              ".write": "!data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() !== true",
+              ".validate": "newData.hasChildren(['roomId','comment','createdAt']) && newData.child('roomId').val() === $roomId && newData.child('comment').isString() && newData.child('createdAt').isNumber()",
+              "roomId": {
+                ".validate": "newData.isString() && newData.val().length <= 40"
               },
               "comment": {
                 ".validate": "newData.isString() && newData.val().length <= 180"
@@ -34,7 +53,8 @@
           }
         },
         "$other": {
-          ".validate": false
+          ".read": false,
+          ".write": false
         }
       }
     }
