@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "emotionRooms": {
+      "v1": {
+        ".read": true,
+        "locked": {
+          ".write": false,
+          ".validate": "newData.isBoolean()"
+        },
+        "submissions": {
+          "$roomId": {
+            "$submissionId": {
+              ".write": "!data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() !== true",
+              ".validate": "newData.hasChildren(['roomId','words','comment','createdAt']) && newData.child('roomId').isString() && newData.child('roomId').val() === $roomId && newData.child('words').hasChildren(['0']) && newData.child('createdAt').isNumber()",
+              "roomId": {
+                ".validate": "newData.isString() && newData.val().length <= 40"
+              },
+              "words": {
+                ".validate": "newData.numChildren() >= 1 && newData.numChildren() <= 3",
+                "$index": {
+                  ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+                }
+              },
+              "comment": {
+                ".validate": "newData.isString() && newData.val().length <= 180"
+              },
+              "createdAt": {
+                ".validate": "newData.isNumber()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
