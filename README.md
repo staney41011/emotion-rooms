@@ -3,10 +3,9 @@
 給課堂使用的手機互動 + 即時文字雲網站。
 
 ## 架構
-- **GitHub**：原始碼與版本管理
-- **Firebase Hosting**：正式網站部署
+- **GitHub / GitHub Pages**：原始碼、版本管理與網站部署
 - **Firebase Realtime Database**：班員投稿與投影文字雲即時同步
-- **Firebase Authentication**：下一階段用於講師管理權限
+- **Firebase Authentication**：班員使用匿名登入；講師管理員登入之後再加入
 
 ## 頁面
 - `index.html`：入口
@@ -20,43 +19,35 @@
 1. **Demo 模式**：`js/firebase-config.js` 尚未填入 Firebase 設定時，自動使用 `localStorage + BroadcastChannel`。
 2. **Firebase 模式**：填入 Firebase Web App 設定後，自動切換為 Firebase Realtime Database，即可跨手機／投影電腦即時同步。
 
+目前 `emotion-rooms` 已填入 Firebase Web App 設定，因此正式頁面會使用 Firebase 模式。
+
 ## Firebase 專案設定
-1. 在 Firebase Console 建立或選擇專案。
-2. 建立 **Realtime Database**，台灣課堂建議選 `asia-southeast1`（Singapore）。
-3. 在 Project settings → Your apps 新增 Web App，取得 `firebaseConfig`。
-4. 把 `firebaseConfig` 的內容填入 `js/firebase-config.js`。
-5. 到 Realtime Database → Rules，把 `database.rules.json` 內容貼上並 Publish；或使用 Firebase CLI 部署。
-6. 啟用 Firebase Hosting。
+1. 建立 **Realtime Database**，位置使用 `asia-southeast1`（Singapore）。
+2. Authentication → Sign-in method → **Anonymous** → Enable → Save。
+3. Realtime Database → Rules，把 repo 根目錄的 `database.rules.json` 全部貼上並 Publish。
+4. Project settings → Your apps 的 Web App 設定已放入 `js/firebase-config.js`。
 
-## Firebase Hosting
-本 repo 已經設定好 `firebase.json`：
-- Hosting 直接部署目前專案根目錄
-- `firebase.json`、`database.rules.json`、README、Git/GitHub 相關檔案不會公開部署
-- 啟用 clean URLs，例如 `/student.html` 會導向 `/student`
-- HTML 與 Firebase config 採低快取，方便更新後快速生效
+## GitHub Pages
+Repository → Settings → Pages → Build and deployment：
+- Source：Deploy from a branch
+- Branch：`main`
+- Folder：`/(root)`
 
-第一次部署：
-
-```bash
-npm install -g firebase-tools
-firebase login
-firebase use --add
-firebase deploy --only hosting,database
-```
-
-之後更新網站通常只需要：
-
-```bash
-firebase deploy --only hosting
-```
-
-正式網址會是：
-- `https://<project-id>.web.app`
-- `https://<project-id>.firebaseapp.com`
+預期網址：
+- `https://staney41011.github.io/emotion-rooms/`
+- 班員：`https://staney41011.github.io/emotion-rooms/student.html`
+- 投影：`https://staney41011.github.io/emotion-rooms/display.html`
+- 控制台：`https://staney41011.github.io/emotion-rooms/admin.html`
 
 ## 資料結構與隱私
 - `emotionRooms/v1/publicWords`：只存文字雲需要的情緒詞與時間，可由投影端即時讀取。
 - `emotionRooms/v1/privateComments`：存完整留言；目前規則禁止公開讀取，之後接講師管理員登入才開放。
 - `emotionRooms/v1/locked`：投稿開關；之後由講師登入權限控制。
 
-目前 Firebase 版先開放班員「新增投稿」，禁止修改／刪除既有投稿；講師的清空、暫停投稿與完整留言讀取會在下一階段加入 Firebase Authentication 管理員權限。
+### 班員權限
+班員不需要建立帳號。網頁會透過 Firebase Anonymous Authentication 自動取得匿名身分後投稿。
+
+目前規則允許已驗證的匿名使用者「新增」投稿，但禁止修改或刪除既有投稿。
+
+### 講師權限
+目前講師端可公開讀取情緒詞以呈現文字雲；完整留言、暫停投稿、清空資料等高權限操作，下一階段會加上講師 Firebase Authentication 與專屬管理權限。
