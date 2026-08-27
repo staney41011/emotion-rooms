@@ -30,10 +30,10 @@
     import { ROOMS } from './js/rooms.js';
 
     const grid = document.querySelector('#qrGrid');
-    const base = new URL('student.html', location.href);
+    const FIREBASE_ORIGIN = 'https://emotion-rooms.web.app';
 
     ROOMS.forEach((room) => {
-      const url = new URL(base.href);
+      const url = new URL('/student', FIREBASE_ORIGIN);
       url.searchParams.set('room', room.id);
 
       const card = document.createElement('article');
