@@ -13,10 +13,10 @@
           "$roomId": {
             ".write": "auth != null && !newData.exists()",
             "$submissionId": {
-              ".write": "auth != null && !data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() !== true",
-              ".validate": "($roomId == 'room1' || $roomId == 'room2' || $roomId == 'room3' || $roomId == 'room4' || $roomId == 'room5' || $roomId == 'room6' || $roomId == 'room7' || $roomId == 'room8') && newData.hasChildren(['roomId','words','createdAt']) && newData.child('roomId').val() === $roomId && newData.child('words').hasChild('0') && !newData.child('words').child('3').exists() && newData.child('createdAt').isNumber()",
+              ".write": "auth != null && !data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() != true",
+              ".validate": "($roomId == 'room1' || $roomId == 'room2' || $roomId == 'room3' || $roomId == 'room4' || $roomId == 'room5' || $roomId == 'room6' || $roomId == 'room7' || $roomId == 'room8') && newData.hasChildren(['roomId','words','createdAt']) && newData.child('roomId').val() == $roomId && newData.child('words').hasChild('0') && !newData.child('words').child('3').exists() && newData.child('createdAt').isNumber()",
               "roomId": {
-                ".validate": "newData.isString() && newData.val() === $roomId"
+                ".validate": "newData.isString() && newData.val() == $roomId"
               },
               "words": {
                 ".validate": "newData.hasChild('0') && !newData.child('3').exists()",
@@ -40,10 +40,10 @@
           "$roomId": {
             ".write": "auth != null && !newData.exists()",
             "$submissionId": {
-              ".write": "auth != null && !data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() !== true",
-              ".validate": "($roomId == 'room1' || $roomId == 'room2' || $roomId == 'room3' || $roomId == 'room4' || $roomId == 'room5' || $roomId == 'room6' || $roomId == 'room7' || $roomId == 'room8') && newData.hasChildren(['roomId','comment','createdAt']) && newData.child('roomId').val() === $roomId && newData.child('comment').isString() && newData.child('createdAt').isNumber()",
+              ".write": "auth != null && !data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() != true",
+              ".validate": "($roomId == 'room1' || $roomId == 'room2' || $roomId == 'room3' || $roomId == 'room4' || $roomId == 'room5' || $roomId == 'room6' || $roomId == 'room7' || $roomId == 'room8') && newData.hasChildren(['roomId','comment','createdAt']) && newData.child('roomId').val() == $roomId && newData.child('comment').isString() && newData.child('createdAt').isNumber()",
               "roomId": {
-                ".validate": "newData.isString() && newData.val() === $roomId"
+                ".validate": "newData.isString() && newData.val() == $roomId"
               },
               "comment": {
                 ".validate": "newData.isString() && newData.val().length <= 180"
