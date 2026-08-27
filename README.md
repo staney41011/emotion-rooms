@@ -3,24 +3,31 @@
 給課堂使用的手機互動 + 即時文字雲網站。
 
 ## 架構
-- **GitHub / GitHub Pages**：原始碼、版本管理與網站部署
-- **Firebase Realtime Database**：班員投稿與投影文字雲即時同步
+- **GitHub**：原始碼與版本管理
+- **Firebase Hosting**：正式網站部署
+- **Firebase Realtime Database**：班員投稿、講師主控與投影即時同步
 - **Firebase Authentication**：所有頁面背景使用 Anonymous Authentication，不顯示登入介面
 
+## 正式網址
+Firebase 專案 ID：`emotion-rooms`
+
+- 公開入口：`https://emotion-rooms.web.app/`
+- 講師主控：`https://emotion-rooms.web.app/admin`
+- 投影畫面：`https://emotion-rooms.web.app/display`
+- QR Code 列印：`https://emotion-rooms.web.app/qrcodes`
+- 第 1 間：`https://emotion-rooms.web.app/student?room=room1`
+- 第 2 間：`https://emotion-rooms.web.app/student?room=room2`
+- 第 3 間：`https://emotion-rooms.web.app/student?room=room3`
+- 第 4 間：`https://emotion-rooms.web.app/student?room=room4`
+- 第 5 間：`https://emotion-rooms.web.app/student?room=room5`
+- 第 6 間：`https://emotion-rooms.web.app/student?room=room6`
+- 第 7 間：`https://emotion-rooms.web.app/student?room=room7`
+- 第 8 間：`https://emotion-rooms.web.app/student?room=room8`
+
+`firebase.json` 已啟用 `cleanUrls`，所以正式網址不需要 `.html`。
+
 ## 班員流程
-班員不從首頁選擇包廂。
-
-每間包廂都有獨立 QR Code：
-- `student.html?room=room1`
-- `student.html?room=room2`
-- `student.html?room=room3`
-- `student.html?room=room4`
-- `student.html?room=room5`
-- `student.html?room=room6`
-- `student.html?room=room7`
-- `student.html?room=room8`
-
-班員完成一間體驗後，重新掃描該包廂 QR Code，直接進入該間填寫頁。
+班員不從首頁選擇包廂。每間包廂都有自己的 QR Code，完成體驗後重新掃描該包廂 QR Code，直接進入該間填寫頁。
 
 班員畫面刻意不顯示：
 - 包廂名稱
@@ -29,42 +36,45 @@
 - 預設情緒詞
 - 其他包廂選單
 
-目的為避免在體驗前後暗示答案，讓參與者自行辨識感受。
+目的為避免暗示答案，讓參與者自行辨識感受。
 
-若直接開啟 `student.html` 而沒有合法 `room` 參數，只會看到「請掃描現場 QR Code」。
+## 講師與投影
+`/admin` 是獨立講師主控頁；`/display` 是純投影頁。
 
-## 頁面
-- `index.html`：公開入口，只提示掃描現場 QR Code，不顯示講師網址
-- `student.html?room=roomN`：班員各包廂回填
-- `display.html`：講師投影文字雲，活動中只顯示「第 N 間」
-- `admin.html`：講師控制台
-- `qrcodes.html`：講師 QR Code 產生與列印頁
+講師在主控選擇「待機／第 1 間～第 8 間」後，Firebase 的 `emotionRooms/v1/currentRoom` 會即時更新，投影頁自動跟著切換，不需要操作投影電腦。
 
-`qrcodes.html` 畫面上會顯示講師內部對照名稱，但列印時會自動隱藏，只印「第 N 間 + QR Code + 網址」。
+## Firebase 設定
+- Realtime Database：`asia-southeast1`
+- Authentication → Anonymous：已要求啟用
+- Realtime Database Rules：使用 repo 根目錄 `database.rules.json`
+- Web App 設定：`js/firebase-config.js`
+- Firebase project alias：`.firebaserc` 指向 `emotion-rooms`
 
-## Firebase
-Firebase 專案：`emotion-rooms`
+## Firebase Hosting 部署
+repo 根目錄已包含 `firebase.json` 與 `.firebaserc`。
 
-Realtime Database：`asia-southeast1`。
+從已登入 Google 帳號的 Firebase CLI / Cloud Shell 執行：
 
-請確認：
-1. Authentication → Sign-in method → **Anonymous** 已啟用。
-2. Realtime Database → Rules 使用 repo 最新版 `database.rules.json` 並 Publish。
-3. `js/firebase-config.js` 已填入 Firebase Web App 設定。
+```bash
+git clone https://github.com/staney41011/emotion-rooms.git
+cd emotion-rooms
+firebase use emotion-rooms
+firebase deploy --only hosting
+```
 
-## GitHub Pages
-Repository → Settings → Pages → Build and deployment：
-- Source：Deploy from a branch
-- Branch：`main`
-- Folder：`/(root)`
+若也要同步部署資料庫 Rules：
 
-預期網址：
-- 公開入口：`https://staney41011.github.io/emotion-rooms/`
-- 投影：`https://staney41011.github.io/emotion-rooms/display.html`
-- 控制台：`https://staney41011.github.io/emotion-rooms/admin.html`
-- QR 列印：`https://staney41011.github.io/emotion-rooms/qrcodes.html`
+```bash
+firebase deploy --only hosting,database
+```
+
+## QR Code
+`/qrcodes` 會產生固定指向 `https://emotion-rooms.web.app/student?room=roomN` 的 8 張 QR Code。
+
+畫面上顯示講師內部對照名稱，但列印時會自動隱藏，只印「第 N 間 + QR Code + 網址」。
 
 ## 資料結構
+- `emotionRooms/v1/currentRoom`：投影目前顯示待機或哪一間
 - `emotionRooms/v1/publicWords`：文字雲需要的 1～3 個感受詞與時間
 - `emotionRooms/v1/privateComments`：選填文字留言，目前禁止公開讀取
 - `emotionRooms/v1/locked`：投稿開關
@@ -74,4 +84,4 @@ Repository → Settings → Pages → Build and deployment：
 
 講師主控頁與投影頁不從公開首頁提供連結；講師自行保存網址。主控操作在背景使用 Firebase Anonymous Authentication，不會出現登入畫面。
 
-這種方式屬於「網址隔離／操作隔離」，不是嚴格的身分權限隔離。適合封閉課堂與可信任參與者；若未來公開對外使用，應改用真正的管理員 Authentication / custom claims。
+這種方式屬於「網址隔離／操作隔離」，不是嚴格的身分權限隔離。若未來公開對外使用，應改用真正的管理員 Authentication / custom claims。
