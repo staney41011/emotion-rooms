@@ -2,6 +2,11 @@
   "rules": {
     "emotionRooms": {
       "v1": {
+        "currentRoom": {
+          ".read": true,
+          ".write": "auth != null",
+          ".validate": "newData.isString() && (newData.val() == 'waiting' || newData.val() == 'room1' || newData.val() == 'room2' || newData.val() == 'room3' || newData.val() == 'room4' || newData.val() == 'room5' || newData.val() == 'room6' || newData.val() == 'room7' || newData.val() == 'room8')"
+        },
         "locked": {
           ".read": true,
           ".write": "auth != null",
