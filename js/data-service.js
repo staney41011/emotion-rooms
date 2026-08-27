@@ -21,9 +21,10 @@ const CHANNEL_NAME = 'emotionRoomsDemoChannel';
 const ROOT_PATH = 'emotionRooms/v1';
 const channel = 'BroadcastChannel' in window ? new BroadcastChannel(CHANNEL_NAME) : null;
 const subscribers = new Set();
+const VALID_PROJECTION_STATES = new Set(['waiting', 'room1', 'room2', 'room3', 'room4', 'room5', 'room6', 'room7', 'room8']);
 
 function emptyState() {
-  return { submissions: {}, locked: false, updatedAt: Date.now() };
+  return { submissions: {}, locked: false, currentRoom: 'waiting', updatedAt: Date.now() };
 }
 
 function isFirebaseConfigured() {
@@ -110,6 +111,17 @@ function startFirebaseSubscription() {
     },
     (error) => console.error('Firebase lock subscription failed:', error)
   );
+
+  onValue(
+    ref(database, `${ROOT_PATH}/currentRoom`),
+    (snapshot) => {
+      const value = snapshot.val();
+      firebaseCache.currentRoom = VALID_PROJECTION_STATES.has(value) ? value : 'waiting';
+      firebaseCache.updatedAt = Date.now();
+      notifySubscribers();
+    },
+    (error) => console.error('Firebase projector state subscription failed:', error)
+  );
 }
 
 function makeSubmission(roomId, payload, id = null) {
@@ -186,7 +198,6 @@ export const dataService = {
   async submit(roomId, payload) {
     if (firebaseEnabled) {
       await ensureFirebaseAuth();
-
       const lockSnapshot = await get(ref(database, `${ROOT_PATH}/locked`));
       if (lockSnapshot.val() === true) throw new Error('目前已暫停投稿');
 
@@ -237,6 +248,30 @@ export const dataService = {
 
   isLocked() {
     return !!currentState().locked;
+  },
+
+  getCurrentRoom() {
+    const value = currentState().currentRoom;
+    return VALID_PROJECTION_STATES.has(value) ? value : 'waiting';
+  },
+
+  async setCurrentRoom(roomId) {
+    if (!VALID_PROJECTION_STATES.has(roomId)) throw new Error('無效的投影畫面。');
+
+    if (firebaseEnabled) {
+      try {
+        await ensureFirebaseAuth();
+        await set(ref(database, `${ROOT_PATH}/currentRoom`), roomId);
+      } catch (error) {
+        throw firebaseAdminMessage(error);
+      }
+      return;
+    }
+
+    const state = readDemoState();
+    state.currentRoom = roomId;
+    writeDemoState(state);
+    notifySubscribers();
   },
 
   async setLocked(locked) {
