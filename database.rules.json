@@ -12,14 +12,23 @@
           "$roomId": {
             "$submissionId": {
               ".write": "auth != null && !data.exists() && newData.exists() && root.child('emotionRooms/v1/locked').val() !== true",
-              ".validate": "newData.hasChildren(['roomId','words','createdAt']) && newData.child('roomId').val() === $roomId && newData.child('words').hasChildren(['0']) && newData.child('createdAt').isNumber()",
+              ".validate": "newData.hasChildren(['roomId','words','createdAt']) && newData.child('roomId').val() === $roomId && newData.child('words').hasChild('0') && newData.child('createdAt').isNumber()",
               "roomId": {
                 ".validate": "newData.isString() && newData.val().length <= 40"
               },
               "words": {
-                ".validate": "newData.numChildren() >= 1 && newData.numChildren() <= 3",
-                "$index": {
+                ".validate": "newData.hasChild('0') && !newData.child('3').exists()",
+                "0": {
                   ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+                },
+                "1": {
+                  ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+                },
+                "2": {
+                  ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+                },
+                "$other": {
+                  ".validate": false
                 }
               },
               "createdAt": {
