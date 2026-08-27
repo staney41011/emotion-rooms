@@ -1,27 +1,10 @@
-import { ROOMS, getRoom } from './rooms.js';
+import { getRoom } from './rooms.js';
 import { dataService } from './data-service.js';
 
-const tabs = document.querySelector('#roomTabs');
 const cloud = document.querySelector('#wordCloud');
 const title = document.querySelector('#cloudTitle');
 const count = document.querySelector('#submissionCount');
-const seedBtn = document.querySelector('#seedBtn');
-
-const requestedId = new URLSearchParams(location.search).get('room');
-let currentId = getRoom(requestedId)?.id || ROOMS[0].id;
-
-ROOMS.forEach((room) => {
-  const button = document.createElement('button');
-  button.className = 'room-tab';
-  button.textContent = `第 ${room.number} 間`;
-  button.dataset.room = room.id;
-  button.addEventListener('click', () => {
-    currentId = room.id;
-    history.replaceState(null, '', `?room=${room.id}`);
-    render();
-  });
-  tabs.appendChild(button);
-});
+let lastRenderedRoom = null;
 
 function aggregate(roomId) {
   const map = new Map();
@@ -40,16 +23,26 @@ function colorFor(index, total) {
   return `hsl(${h} 80% ${light}%)`;
 }
 
-function render() {
-  const room = getRoom(currentId);
-  if (!room) return;
+function renderWaiting() {
+  lastRenderedRoom = 'waiting';
+  title.innerHTML = '<h1>等待下一段體驗</h1><p>請依現場講師指示進行</p>';
+  cloud.innerHTML = '<div class="cloud-empty" style="font-size:clamp(1.4rem,3vw,2.2rem)">完成體驗後，掃描現場 QR Code<br>寫下你真正出現的感受。</div>';
+  count.textContent = '待機中';
+}
 
-  [...tabs.children].forEach((el) => el.classList.toggle('active', el.dataset.room === currentId));
+function renderRoom(roomId) {
+  const room = getRoom(roomId);
+  if (!room) {
+    renderWaiting();
+    return;
+  }
+
+  lastRenderedRoom = roomId;
   title.innerHTML = `<h1>第 ${room.number} 間包廂</h1><p>大家剛才寫下的感受</p>`;
 
-  const submissions = dataService.getSubmissions(currentId);
+  const submissions = dataService.getSubmissions(roomId);
   count.textContent = `${submissions.length} 份投稿`;
-  const words = aggregate(currentId);
+  const words = aggregate(roomId);
   cloud.innerHTML = '';
 
   if (!words.length) {
@@ -71,18 +64,15 @@ function render() {
   });
 }
 
-if (dataService.mode === 'firebase' && seedBtn) seedBtn.hidden = true;
+function render() {
+  const currentRoom = dataService.getCurrentRoom();
+  if (currentRoom === 'waiting') {
+    renderWaiting();
+  } else {
+    renderRoom(currentRoom);
+  }
+}
 
 dataService.subscribe(render);
-seedBtn?.addEventListener('click', async () => {
-  const room = getRoom(currentId);
-  if (!room) return;
-  try {
-    await dataService.seedDemo(currentId, room.examples);
-  } catch (error) {
-    alert(error.message || '無法載入示範資料');
-  }
-});
-
 document.querySelector('#fullscreenBtn').addEventListener('click', () => document.documentElement.requestFullscreen?.());
 render();
