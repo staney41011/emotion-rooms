@@ -8,13 +8,28 @@
 <body>
   <main class="shell">
     <div class="topbar"><div class="brand">🎛️ 講師控制台</div><span class="small-note">網址請勿提供給班員</span></div>
+
+    <section class="panel" style="border:2px solid rgba(124,131,253,.28)">
+      <div class="eyebrow">PROJECTOR CONTROL</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap">
+        <div>
+          <h1 style="font-size:clamp(2rem,5vw,3rem);margin:4px 0 8px">控制現在投影的畫面</h1>
+          <p class="small-note">投影電腦只要開著投影網址，就會自動跟著這裡切換，不需要操作投影電腦。</p>
+        </div>
+        <a class="btn soft" href="display.html" target="_blank">開啟獨立投影頁 ↗</a>
+      </div>
+      <div id="projectionStatus" style="margin:20px 0 14px;font-size:1.15rem;font-weight:800"></div>
+      <div id="projectionControls" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px"></div>
+    </section>
+
     <section class="panel">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
-        <div><div class="eyebrow">CLASS DASHBOARD</div><h1 style="font-size:clamp(2rem,5vw,3.2rem);margin-bottom:8px">情緒包廂即時狀態</h1><p class="small-note">Firebase 即時同步。班員從各包廂 QR Code 直接投稿。</p></div>
+        <div><div class="eyebrow">CLASS DASHBOARD</div><h2 style="font-size:clamp(1.7rem,4vw,2.5rem);margin-bottom:8px">情緒包廂即時狀態</h2><p class="small-note">Firebase 即時同步。班員從各包廂 QR Code 直接投稿。</p></div>
         <div class="btn-row"><button class="btn soft" id="lockBtn">暫停投稿</button><button class="btn danger" id="clearAllBtn">清空全部</button></div>
       </div>
       <div class="stat-grid" id="statGrid" style="margin-top:22px"></div>
     </section>
+
     <div class="admin-grid">
       <section class="panel">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2>最新投稿詞彙</h2><select class="input" id="roomFilter" style="width:auto"></select></div>
@@ -22,11 +37,11 @@
       </section>
       <section class="panel">
         <h2>講師工具</h2>
-        <p class="small-note">可清空指定包廂、開啟投影，或列印 8 張中性 QR Code。</p>
+        <p class="small-note">可清空指定包廂或列印 8 張中性 QR Code。</p>
         <select class="input" id="actionRoom" style="margin-top:14px"></select>
         <div class="btn-row"><button class="btn primary" id="seedRoomBtn">載入示範資料</button><button class="btn danger" id="clearRoomBtn">清空本包廂</button></div>
         <hr style="border:0;border-top:1px solid var(--line);margin:24px 0">
-        <div class="btn-row"><a class="btn soft" href="display.html" target="_blank">開啟投影畫面 ↗</a><a class="btn soft" href="qrcodes.html" target="_blank">QR Code 列印頁 ↗</a></div>
+        <div class="btn-row"><a class="btn soft" href="qrcodes.html" target="_blank">QR Code 列印頁 ↗</a></div>
       </section>
     </div>
   </main>
