@@ -70,9 +70,7 @@ function currentState() {
 
 function notifySubscribers() {
   subscribers.forEach((callback) => callback(currentState()));
-  if (!firebaseEnabled) {
-    window.dispatchEvent(new CustomEvent('emotion-data-changed'));
-  }
+  if (!firebaseEnabled) window.dispatchEvent(new CustomEvent('emotion-data-changed'));
 }
 
 function normalizePublicWords(raw) {
@@ -138,7 +136,7 @@ function authErrorMessage(error) {
   return error;
 }
 
-function ensureStudentAuth() {
+function ensureFirebaseAuth() {
   if (!firebaseEnabled) return Promise.resolve(null);
   if (auth?.currentUser) return Promise.resolve(auth.currentUser);
   if (authPromise) return authPromise;
@@ -177,7 +175,7 @@ function ensureStudentAuth() {
 
 function firebaseAdminMessage(error) {
   if (error?.code === 'PERMISSION_DENIED' || error?.code === 'permission-denied') {
-    return new Error('Firebase 已連線，但講師管理權限尚未設定。下一步接管理員登入後即可使用此功能。');
+    return new Error('Firebase 規則尚未允許這個講師操作，請確認已發布 GitHub 最新版 database.rules.json。');
   }
   return error;
 }
@@ -187,7 +185,7 @@ export const dataService = {
 
   async submit(roomId, payload) {
     if (firebaseEnabled) {
-      await ensureStudentAuth();
+      await ensureFirebaseAuth();
 
       const lockSnapshot = await get(ref(database, `${ROOT_PATH}/locked`));
       if (lockSnapshot.val() === true) throw new Error('目前已暫停投稿');
@@ -244,6 +242,7 @@ export const dataService = {
   async setLocked(locked) {
     if (firebaseEnabled) {
       try {
+        await ensureFirebaseAuth();
         await set(ref(database, `${ROOT_PATH}/locked`), !!locked);
       } catch (error) {
         throw firebaseAdminMessage(error);
@@ -259,6 +258,7 @@ export const dataService = {
   async clearRoom(roomId) {
     if (firebaseEnabled) {
       try {
+        await ensureFirebaseAuth();
         await update(ref(database, ROOT_PATH), {
           [`publicWords/${roomId}`]: null,
           [`privateComments/${roomId}`]: null
@@ -277,6 +277,7 @@ export const dataService = {
   async clearAll() {
     if (firebaseEnabled) {
       try {
+        await ensureFirebaseAuth();
         await remove(ref(database, `${ROOT_PATH}/publicWords`));
         await remove(ref(database, `${ROOT_PATH}/privateComments`));
       } catch (error) {
@@ -290,9 +291,7 @@ export const dataService = {
   },
 
   async seedDemo(roomId, words) {
-    if (firebaseEnabled) {
-      throw new Error('正式 Firebase 模式不提供 Demo 資料寫入。');
-    }
+    if (firebaseEnabled) throw new Error('正式 Firebase 模式不提供 Demo 資料寫入。');
 
     const sample = words.length ? words : ['緊張', '期待', '不安', '開心'];
     const generated = [];
