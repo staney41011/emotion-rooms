@@ -2,8 +2,11 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>包廂 QR Code｜講師用</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20260829-1">
   <style>
     .qr-toolbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
     .qr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
@@ -25,9 +28,14 @@
     <section class="qr-grid" id="qrGrid"></section>
   </main>
 
+  <script>
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) window.location.reload();
+    });
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module">
-    import { ROOMS } from './js/rooms.js';
+    import { ROOMS } from './js/rooms.js?v=20260829-1';
 
     const grid = document.querySelector('#qrGrid');
     const FIREBASE_ORIGIN = 'https://emotion-rooms.web.app';
