@@ -1,5 +1,5 @@
-import { ROOMS, getRoom } from './rooms.js';
-import { dataService } from './data-service.js';
+import { ROOMS, getRoom } from './rooms.js?v=20260829-1';
+import { dataService } from './data-service.js?v=20260829-1';
 
 const statGrid = document.querySelector('#statGrid');
 const list = document.querySelector('#submissionList');
