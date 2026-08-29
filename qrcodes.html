@@ -6,7 +6,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>包廂 QR Code｜講師用</title>
-  <link rel="stylesheet" href="css/style.css?v=20260829-1">
+  <link rel="stylesheet" href="css/style.css?v=20260829-2">
   <style>
     .qr-toolbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
     .qr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
@@ -22,7 +22,7 @@
   <main class="shell">
     <div class="topbar"><div class="brand"><span class="brand-mark">QR</span> 包廂 QR Code</div><span class="small-note">講師用</span></div>
     <div class="qr-toolbar">
-      <div><h1 style="margin:0 0 8px">8 間包廂 QR Code</h1><div class="small-note">列印版只顯示中性編號，不顯示內部情緒名稱。</div></div>
+      <div><h1 style="margin:0 0 8px">6 間包廂 QR Code</h1><div class="small-note">列印版只顯示中性編號，不顯示內部情緒名稱。</div></div>
       <button class="btn primary" type="button" onclick="window.print()">列印 QR Code</button>
     </div>
     <section class="qr-grid" id="qrGrid"></section>
@@ -35,11 +35,11 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module">
-    import { ROOMS } from './js/rooms.js?v=20260829-1';
+    import { ROOMS } from './js/rooms.js?v=20260829-2';
 
     const grid = document.querySelector('#qrGrid');
     const FIREBASE_ORIGIN = 'https://emotion-rooms.web.app';
-    const SITE_VERSION = '20260829-1';
+    const SITE_VERSION = '20260829-2';
 
     ROOMS.forEach((room) => {
       const url = new URL('/student', FIREBASE_ORIGIN);
