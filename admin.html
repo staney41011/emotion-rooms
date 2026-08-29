@@ -6,7 +6,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>講師控制台｜情緒包廂</title>
-  <link rel="stylesheet" href="css/style.css?v=20260829-1">
+  <link rel="stylesheet" href="css/style.css?v=20260829-2">
 </head>
 <body>
   <main class="shell">
@@ -19,10 +19,24 @@
           <h1 style="font-size:clamp(2rem,5vw,3rem);margin:4px 0 8px">控制現在投影的畫面</h1>
           <p class="small-note">投影電腦只要開著投影網址，就會自動跟著這裡切換，不需要操作投影電腦。</p>
         </div>
-        <a class="btn soft" href="/display" target="_blank">開啟獨立投影頁 ↗</a>
+        <a class="btn soft" href="/display?v=20260829-2" target="_blank">開啟獨立投影頁 ↗</a>
       </div>
       <div id="projectionStatus" style="margin:20px 0 14px;font-size:1.15rem;font-weight:800"></div>
       <div id="projectionControls" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px"></div>
+    </section>
+
+    <section class="panel" style="margin-top:18px;border:2px solid rgba(14,165,164,.2)">
+      <div class="eyebrow">EXPERIENCE PAGES</div>
+      <h2 style="font-size:clamp(1.6rem,4vw,2.3rem);margin:6px 0 8px">你負責的兩個體驗頁</h2>
+      <p class="small-note">現場電腦直接開啟後，按一次開始即可自動進行約 10 分鐘。建議使用全螢幕。</p>
+      <div class="btn-row" style="margin-top:16px">
+        <a class="btn primary" href="/experience-room4?v=20260829-2" target="_blank">第 4 間體驗頁 ↗</a>
+        <a class="btn primary" href="/experience-room6?v=20260829-2" target="_blank">第 6 間體驗頁 ↗</a>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <a class="btn soft" href="/experience-room4?demo=1&v=20260829-2" target="_blank">第 4 間 90 秒測試版</a>
+        <a class="btn soft" href="/experience-room6?demo=1&v=20260829-2" target="_blank">第 6 間 90 秒測試版</a>
+      </div>
     </section>
 
     <section class="panel">
@@ -40,11 +54,11 @@
       </section>
       <section class="panel">
         <h2>講師工具</h2>
-        <p class="small-note">可清空指定包廂或列印 8 張中性 QR Code。</p>
+        <p class="small-note">可清空指定包廂或列印 6 張中性 QR Code。</p>
         <select class="input" id="actionRoom" style="margin-top:14px"></select>
         <div class="btn-row"><button class="btn primary" id="seedRoomBtn">載入示範資料</button><button class="btn danger" id="clearRoomBtn">清空本包廂</button></div>
         <hr style="border:0;border-top:1px solid var(--line);margin:24px 0">
-        <div class="btn-row"><a class="btn soft" href="/qrcodes" target="_blank">QR Code 列印頁 ↗</a></div>
+        <div class="btn-row"><a class="btn soft" href="/qrcodes?v=20260829-2" target="_blank">QR Code 列印頁 ↗</a></div>
       </section>
     </div>
   </main>
@@ -53,6 +67,6 @@
       if (event.persisted) window.location.reload();
     });
   </script>
-  <script type="module" src="js/admin.js?v=20260829-1"></script>
+  <script type="module" src="js/admin.js?v=20260829-2"></script>
 </body>
 </html>
