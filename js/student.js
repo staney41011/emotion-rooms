@@ -1,4 +1,4 @@
-import { ROOMS, getRoom } from './rooms.js?v=20260829-1';
+import { ROOMS, getRoom } from './rooms.js?v=20260829-2';
 import { dataService } from './data-service.js?v=20260829-1';
 
 const inputStep = document.querySelector('#inputStep');
@@ -15,7 +15,7 @@ const roomExperienceTitle = document.querySelector('#roomExperienceTitle');
 
 const roomId = new URLSearchParams(location.search).get('room');
 const currentRoom = getRoom(roomId);
-const chineseNumbers = ['', '一', '二', '三', '四', '五', '六', '七', '八'];
+const chineseNumbers = ['', '一', '二', '三', '四', '五', '六'];
 
 function currentWords() {
   return inputs.map((input) => input.value.trim()).filter(Boolean);
