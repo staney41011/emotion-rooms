@@ -39,10 +39,12 @@
 
     const grid = document.querySelector('#qrGrid');
     const FIREBASE_ORIGIN = 'https://emotion-rooms.web.app';
+    const SITE_VERSION = '20260829-1';
 
     ROOMS.forEach((room) => {
       const url = new URL('/student', FIREBASE_ORIGIN);
       url.searchParams.set('room', room.id);
+      url.searchParams.set('v', SITE_VERSION);
 
       const card = document.createElement('article');
       card.className = 'qr-card';
