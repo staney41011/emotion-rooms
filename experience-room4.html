@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>第4間體驗</title>
+  <style>
+    :root{color-scheme:dark;--bg:#071217;--panel:#0d2026;--line:rgba(255,255,255,.12);--text:#f4fbfc;--muted:#91a7ad;--accent:#56e0d2;--danger:#ff746c}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;color:var(--text);overflow:hidden}
+    button{font:inherit}button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+    .app{position:relative;min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 30%,rgba(86,224,210,.08),transparent 38%),linear-gradient(160deg,#071217,#091a20 55%,#071217)}
+    .top{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line);background:rgba(4,13,17,.72);backdrop-filter:blur(16px);z-index:3}
+    .brand{font-weight:900;letter-spacing:.04em}.meta{display:flex;gap:14px;align-items:center;color:var(--muted);font-size:.9rem}.time{font-variant-numeric:tabular-nums;font-weight:900;color:#d9fbf7}
+    .mini-btn{border:1px solid var(--line);background:rgba(255,255,255,.05);color:#c9d9dc;border-radius:12px;padding:8px 12px;cursor:pointer}
+    .progress{height:4px;background:rgba(255,255,255,.06);position:relative}.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#39c6b7,#9bf5eb);transition:width .15s linear}
+    .stage{position:relative;flex:1;display:grid;place-items:center;padding:34px 22px 44px;min-height:0}
+    .card{width:min(980px,94vw);min-height:min(620px,75vh);border:1px solid var(--line);background:linear-gradient(180deg,rgba(16,38,45,.94),rgba(9,25,30,.94));border-radius:30px;box-shadow:0 35px 90px rgba(0,0,0,.42);padding:clamp(24px,4vw,52px);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden}
+    .card::after{content:"";position:absolute;inset:auto -15% -48% -15%;height:60%;background:radial-gradient(ellipse,rgba(86,224,210,.12),transparent 68%);pointer-events:none}
+    .phase{position:absolute;top:20px;left:24px;font-size:.8rem;color:#67848a;letter-spacing:.12em;font-weight:800}.countdown{position:absolute;top:18px;right:24px;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;border:2px solid rgba(255,255,255,.14);font-size:1.05rem;font-weight:950;font-variant-numeric:tabular-nums}.countdown.hot{color:#ffd1ce;border-color:rgba(255,116,108,.56);box-shadow:0 0 30px rgba(255,116,108,.16)}
+    .instruction{font-size:clamp(1rem,2vw,1.25rem);color:#a8babe;margin-bottom:18px;font-weight:700}.prompt{font-size:clamp(2.15rem,6vw,5.4rem);font-weight:950;line-height:1.06;letter-spacing:-.04em;margin:0;max-width:850px}.sub{color:#8ea4aa;margin-top:16px;font-size:clamp(.95rem,1.8vw,1.15rem);line-height:1.6}
+    .grid{display:grid;grid-template-columns:repeat(6,minmax(48px,1fr));gap:10px;width:min(720px,92%);margin-top:28px}.tile{min-height:68px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.045);border-radius:16px;color:#e9f7f8;font-weight:900;font-size:1.45rem;display:grid;place-items:center;cursor:pointer;transition:.08s}.tile:active{transform:scale(.96);background:rgba(86,224,210,.14)}
+    .choices{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:14px;width:min(760px,92%);margin-top:30px}.choice{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);color:#eefafa;border-radius:18px;padding:18px 22px;font-weight:900;font-size:clamp(1.05rem,2vw,1.35rem);cursor:pointer;min-height:72px}.choice:active{transform:scale(.98);background:rgba(86,224,210,.13)}
+    .memory{font-size:clamp(2.8rem,9vw,7.8rem);font-weight:950;letter-spacing:.18em;font-variant-numeric:tabular-nums;margin:20px 0}.memory.hidden{filter:blur(22px);opacity:.08;user-select:none}
+    .feedback{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);font-weight:850;color:#a7c1c5;min-height:24px}.flash{animation:flash .25s ease}@keyframes flash{50%{background:#153840}}
+    .finish-box{width:min(700px,90%);margin-top:34px}.finish-bar{height:34px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.08)}.finish-fill{height:100%;width:0;background:linear-gradient(90deg,#38c8b8,#8cf2e7);transition:width .8s cubic-bezier(.22,.8,.22,1)}.finish-percent{font-size:clamp(3rem,9vw,7rem);font-weight:950;margin-top:22px;font-variant-numeric:tabular-nums;letter-spacing:-.05em}
+    .overlay{position:absolute;inset:0;z-index:8;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 35%,#12333a 0,#071217 56%,#040a0d 100%)}.intro{width:min(720px,94vw);text-align:center}.intro .num{display:inline-grid;place-items:center;width:68px;height:68px;border-radius:22px;background:#e9fffc;color:#062023;font-size:2rem;font-weight:950;box-shadow:0 18px 60px rgba(86,224,210,.2)}.intro h1{font-size:clamp(2.8rem,8vw,5.8rem);margin:24px 0 12px;letter-spacing:-.05em}.intro p{color:#9eb5ba;font-size:clamp(1rem,2vw,1.25rem);line-height:1.8;margin:0 auto;max-width:600px}.start{margin-top:32px;border:0;border-radius:18px;background:#eafffc;color:#082126;padding:17px 32px;font-weight:950;font-size:1.15rem;cursor:pointer;box-shadow:0 16px 44px rgba(86,224,210,.14)}
+    .silent{font-size:clamp(3rem,9vw,7rem);font-weight:950;letter-spacing:-.05em}.silent-note{margin-top:20px;color:#6e858a;font-size:1rem}.end-actions{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap;justify-content:center}
+    @media(max-width:700px){.top{padding:0 12px}.meta span:first-child{display:none}.stage{padding:16px 10px 24px}.card{min-height:76vh;padding:22px 14px;border-radius:22px}.grid{grid-template-columns:repeat(5,1fr);gap:7px}.tile{min-height:56px;font-size:1.15rem}.choices{grid-template-columns:1fr}.phase{left:16px}.countdown{right:16px}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="top">
+      <div class="brand">第4間體驗</div>
+      <div class="meta"><span id="phaseLabel">準備中</span><span class="time" id="sessionTime">10:00</span><button class="mini-btn" id="restartBtn" type="button">重來</button></div>
+    </header>
+    <div class="progress"><i id="sessionProgress"></i></div>
+    <section class="stage"><div class="card" id="card"></div></section>
+
+    <div class="overlay" id="intro">
+      <div class="intro">
+        <div class="num">4</div>
+        <h1>第4間體驗</h1>
+        <p>請依照畫面完成任務。看到題目後直接做，不需要討論答案。<br>按下開始後，畫面與聲音會自動進行約 10 分鐘。</p>
+        <button class="start" id="startBtn" type="button">開始體驗</button>
+      </div>
+    </div>
+  </main>
+<script>
+(() => {
+  const demo = new URLSearchParams(location.search).get('demo') === '1';
+  const TOTAL = demo ? 90000 : 600000;
+  const SILENT_AT = TOTAL * .9;
+  const card = document.querySelector('#card');
+  const intro = document.querySelector('#intro');
+  const startBtn = document.querySelector('#startBtn');
+  const restartBtn = document.querySelector('#restartBtn');
+  const sessionTime = document.querySelector('#sessionTime');
+  const sessionProgress = document.querySelector('#sessionProgress');
+  const phaseLabel = document.querySelector('#phaseLabel');
+  let startedAt = 0, running = false, taskEndsAt = 0, nextTaskAt = 0, taskNo = 0, raf = 0, lastTick = null, audio = null, timers = [];
+
+  const phases = [
+    {max:.15,label:'第一段',kind:'simple'},
+    {max:.35,label:'第二段',kind:'speed'},
+    {max:.55,label:'第三段',kind:'memory'},
+    {max:.75,label:'第四段',kind:'choice'},
+    {max:.90,label:'第五段',kind:'finish'},
+    {max:1,label:'最後一段',kind:'silent'}
+  ];
+
+  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
+  function later(fn,ms){ const id=setTimeout(fn,ms); timers.push(id); return id; }
+  function fmt(ms){ const s=Math.max(0,Math.ceil(ms/1000)); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+  function phaseFor(p){ return phases.find(x=>p < x.max) || phases.at(-1); }
+  function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
+
+  function ensureAudio(){
+    if(audio) return;
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC) audio=new AC();
+  }
+  function tone(freq=760,duration=.055,volume=.025){
+    if(!audio) return;
+    const o=audio.createOscillator(), g=audio.createGain();
+    o.type='sine';o.frequency.value=freq;g.gain.value=volume;o.connect(g);g.connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+duration);o.stop(audio.currentTime+duration+.01);
+  }
+  function buzz(){ tone(220,.13,.035); }
+
+  function frame(title,sub='看到後直接做。'){
+    return `<div class="phase">TASK ${String(taskNo).padStart(2,'0')}</div><div class="countdown" id="countdown">–</div><div class="instruction">${sub}</div><h2 class="prompt">${title}</h2><div id="taskBody"></div><div class="feedback" id="feedback"></div>`;
+  }
+  function feedback(text){ const el=document.querySelector('#feedback'); if(el) el.textContent=text; }
+  function answer(text='已記錄'){
+    feedback(text); tone(520,.045,.018); taskEndsAt=0; nextTaskAt=performance.now()+520;
+    card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
+  }
+  function bindAnswers(){ document.querySelectorAll('[data-answer]').forEach(b=>b.addEventListener('click',()=>answer(b.dataset.reply||'已記錄'))); }
+
+  function simpleTask(speed=false){
+    const type=taskNo%3;
+    if(type===0){
+      const base=shuffle(['24','31','46','52','68','73','85','91']); const target=base[rand(0,base.length-1)];
+      const vals=Array.from({length:speed?30:24},()=>base[rand(0,base.length-1)]); vals[rand(0,vals.length-1)]=target;
+      card.innerHTML=frame(`找出 ${target}`,speed?'時間會越來越短。':'找得到就直接點。');
+      document.querySelector('#taskBody').innerHTML=`<div class="grid">${vals.map(v=>`<button class="tile" data-answer="1">${v}</button>`).join('')}</div>`;
+    }else if(type===1){
+      const symbols=['●','■','▲','◆']; const common=symbols[rand(0,3)], odd=symbols.filter(x=>x!==common)[rand(0,2)]; const vals=Array(speed?30:24).fill(common); vals[rand(0,vals.length-1)]=odd;
+      card.innerHTML=frame('找出不一樣的圖形',speed?'不要想太久。':'看到就直接點。');
+      document.querySelector('#taskBody').innerHTML=`<div class="grid">${vals.map(v=>`<button class="tile" data-answer="1">${v}</button>`).join('')}</div>`;
+    }else{
+      const nums=shuffle(Array.from({length:20},(_,i)=>i+11)).slice(0,speed?30:24); const max=Math.max(...nums);
+      card.innerHTML=frame('點最大的數字',speed?'快一點。':'看到就直接點。');
+      document.querySelector('#taskBody').innerHTML=`<div class="grid">${nums.map(v=>`<button class="tile" data-answer="1">${v}</button>`).join('')}</div>`;
+    }
+    bindAnswers();
+  }
+
+  function memoryTask(){
+    const len=rand(5,8), digits=Array.from({length:len},()=>rand(1,9)); const ask=rand(0,len-1); const correct=digits[ask];
+    card.innerHTML=frame('記住這串數字','只有一下。');
+    document.querySelector('#taskBody').innerHTML=`<div class="memory" id="memory">${digits.join('')}</div><div class="sub" id="memoryHint">先記住。</div>`;
+    later(()=>{
+      const mem=document.querySelector('#memory'); if(!mem) return; mem.classList.add('hidden');
+      document.querySelector('.prompt').textContent=`第 ${ask+1} 個數字是？`;
+      const options=shuffle([...new Set([correct,rand(1,9),rand(1,9),rand(1,9),rand(1,9)])]).slice(0,4);
+      while(!options.includes(correct)) options[rand(0,options.length-1)]=correct;
+      document.querySelector('#memoryHint').remove();
+      const body=document.querySelector('#taskBody'); body.insertAdjacentHTML('beforeend',`<div class="choices">${options.map(v=>`<button class="choice" data-answer="1">${v}</button>`).join('')}</div>`); bindAnswers();
+    }, demo?900:1800);
+  }
+
+  const choiceSets=[
+    ['自由','成功','關係','安定'],['現在完成','做到完美','先休息','繼續撐'],['自己決定','聽別人意見','再想一下','立刻行動'],['熟悉的路','沒走過的路','最安全的路','最快的路'],['被理解','被肯定','有選擇','有掌控'],['先做再說','想清楚再做','問別人','暫時不選']
+  ];
+  function choiceTask(){
+    const opts=choiceSets[taskNo%choiceSets.length];
+    card.innerHTML=frame('3 秒內選一個','沒有標準答案，但不要停太久。');
+    document.querySelector('#taskBody').innerHTML=`<div class="choices">${opts.map(v=>`<button class="choice" data-answer="1">${v}</button>`).join('')}</div>`; bindAnswers();
+  }
+
+  function finishTask(){
+    const start=rand(91,96), stop=rand(98,99);
+    card.innerHTML=frame('快完成了','請等到完成。');
+    document.querySelector('#taskBody').innerHTML=`<div class="finish-box"><div class="finish-bar"><div class="finish-fill" id="finishFill"></div></div><div class="finish-percent" id="finishPercent">${start}%</div><div class="sub" id="finishHint">處理中…</div></div>`;
+    let n=start; const step=()=>{ if(!document.querySelector('#finishFill')) return; n=Math.min(stop,n+1); document.querySelector('#finishFill').style.width=n+'%'; document.querySelector('#finishPercent').textContent=n+'%'; if(n<stop) later(step,demo?260:620); else later(()=>{ const h=document.querySelector('#finishHint'); if(h)h.textContent='還差一點…'; },demo?500:1600); }; later(step,300);
+  }
+
+  function renderSilent(){
+    clearTimers(); taskEndsAt=0; phaseLabel.textContent='最後一段'; card.innerHTML=`<div class="silent">……</div><div class="silent-note">請留在畫面前。</div>`;
+  }
+  function renderEnd(){
+    running=false; cancelAnimationFrame(raf); clearTimers(); phaseLabel.textContent='完成'; sessionTime.textContent='00:00'; sessionProgress.style.width='100%';
+    card.innerHTML=`<div class="silent">完成</div><div class="silent-note">請依現場指示前往下一步。</div><div class="end-actions"><button class="choice" id="againBtn" type="button">再播放一次</button></div>`;
+    document.querySelector('#againBtn').addEventListener('click',resetAndStart);
+  }
+
+  function newTask(now,p){
+    clearTimers(); taskNo++; const ph=phaseFor(p); phaseLabel.textContent=ph.label;
+    const base= demo ? 4500 : ph.kind==='simple'?11000:ph.kind==='speed'?8000:ph.kind==='memory'?10000:ph.kind==='choice'?7000:11500;
+    taskEndsAt=now+base; lastTick=null;
+    if(ph.kind==='simple') simpleTask(false); else if(ph.kind==='speed') simpleTask(true); else if(ph.kind==='memory') memoryTask(); else if(ph.kind==='choice') choiceTask(); else if(ph.kind==='finish') finishTask();
+  }
+
+  function loop(now){
+    if(!running) return;
+    const elapsed=now-startedAt, p=Math.min(1,elapsed/TOTAL), remain=TOTAL-elapsed;
+    sessionTime.textContent=fmt(remain); sessionProgress.style.width=(p*100).toFixed(2)+'%';
+    if(elapsed>=TOTAL){ renderEnd(); return; }
+    if(elapsed>=SILENT_AT){ if(card.dataset.silent!=='1'){card.dataset.silent='1';renderSilent();} raf=requestAnimationFrame(loop); return; }
+    const ph=phaseFor(p); phaseLabel.textContent=ph.label;
+    if(!taskEndsAt && now>=nextTaskAt) newTask(now,p);
+    if(taskEndsAt){
+      const r=taskEndsAt-now; const cd=document.querySelector('#countdown'); const sec=Math.max(0,Math.ceil(r/1000));
+      if(cd){ cd.textContent=sec; cd.classList.toggle('hot',sec<=3); }
+      if(sec!==lastTick && sec<=3 && sec>0){ tone(sec===1?980:760,.05,.025); lastTick=sec; }
+      if(r<=0){ buzz(); feedback('時間到'); taskEndsAt=0; nextTaskAt=now+(demo?350:700); }
+    }
+    raf=requestAnimationFrame(loop);
+  }
+
+  async function goFullscreen(){ try{ if(document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); }catch{} }
+  function start(){
+    ensureAudio(); audio?.resume?.(); intro.style.display='none'; card.dataset.silent='0'; running=true; taskNo=0; startedAt=performance.now(); nextTaskAt=startedAt; taskEndsAt=0; clearTimers(); goFullscreen(); raf=requestAnimationFrame(loop);
+  }
+  function resetAndStart(){ cancelAnimationFrame(raf); clearTimers(); start(); }
+  function reset(){ running=false; cancelAnimationFrame(raf); clearTimers(); sessionProgress.style.width='0'; sessionTime.textContent=fmt(TOTAL); phaseLabel.textContent='準備中'; intro.style.display='grid'; card.innerHTML=''; }
+
+  startBtn.addEventListener('click',start); restartBtn.addEventListener('click',reset);
+  window.addEventListener('pageshow',e=>{if(e.persisted) location.reload();});
+  sessionTime.textContent=fmt(TOTAL);
+})();
+</script>
+</body>
+</html>
