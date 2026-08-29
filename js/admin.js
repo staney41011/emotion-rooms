@@ -1,4 +1,4 @@
-import { ROOMS, getRoom } from './rooms.js?v=20260829-1';
+import { ROOMS, getRoom } from './rooms.js?v=20260829-2';
 import { dataService } from './data-service.js?v=20260829-1';
 
 const statGrid = document.querySelector('#statGrid');
@@ -35,8 +35,10 @@ projectionOptions.forEach((option) => {
 });
 
 function renderProjectionControl() {
-  const current = dataService.getCurrentRoom();
-  const currentRoom = getRoom(current);
+  const rawCurrent = dataService.getCurrentRoom();
+  const currentRoom = getRoom(rawCurrent);
+  const current = rawCurrent === 'waiting' || currentRoom ? rawCurrent : 'waiting';
+
   projectionStatus.textContent = current === 'waiting'
     ? '目前投影：待機畫面'
     : `目前投影：第 ${currentRoom.number} 間（講師對照：${currentRoom.name}）`;
@@ -58,6 +60,7 @@ function render() {
   const items = dataService.getAllSubmissions().filter(item => roomId === 'all' || item.roomId === roomId).slice(0, 80);
   list.innerHTML = items.length ? items.map(item => {
     const room = getRoom(item.roomId);
+    if (!room) return '';
     const time = new Date(item.createdAt).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
     return `<article class="submission"><div class="meta">${room.emoji} ${room.name} · ${time}</div><div class="words">${item.words.join('　')}</div>${item.comment ? `<div class="comment">${escapeHtml(item.comment)}</div>` : ''}</article>`;
   }).join('') : '<div class="small-note">目前沒有投稿。</div>';
