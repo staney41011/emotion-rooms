@@ -5,17 +5,29 @@
   <title>感受文字雲｜投影畫面</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body style="background:#0d1020">
+<body class="display-page">
   <main class="display-shell">
-    <div class="display-toolbar">
-      <div class="display-brand">感受文字雲 · LIVE</div>
-      <div class="small-note" style="color:#aab1c7">畫面由講師主控即時切換</div>
-      <div class="btn-row" style="margin:0"><button class="btn soft" id="fullscreenBtn">全螢幕</button></div>
+    <div class="display-ambient" aria-hidden="true">
+      <div class="ambient-orb ambient-orb-1"></div>
+      <div class="ambient-orb ambient-orb-2"></div>
+      <div class="ambient-orb ambient-orb-3"></div>
+      <div class="ambient-ribbon ambient-ribbon-1"></div>
+      <div class="ambient-ribbon ambient-ribbon-2"></div>
+      <div class="ambient-particles"></div>
+      <div class="ambient-vignette"></div>
     </div>
+
+    <div class="display-toolbar">
+      <div class="display-brand"><span class="live-dot"></span>感受文字雲 · LIVE</div>
+      <div class="small-note display-sync-note">畫面由講師主控即時切換</div>
+      <div class="btn-row" style="margin:0"><button class="btn soft display-fullscreen" id="fullscreenBtn">全螢幕</button></div>
+    </div>
+
     <section class="cloud-stage">
       <div class="cloud-title" id="cloudTitle"></div>
       <div class="word-cloud" id="wordCloud"></div>
     </section>
+
     <footer class="display-footer"><span id="submissionCount">待機中</span><span>Firebase 即時同步</span></footer>
   </main>
   <script type="module" src="js/display.js"></script>
