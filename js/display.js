@@ -1,5 +1,5 @@
-import { getRoom } from './rooms.js';
-import { dataService } from './data-service.js';
+import { getRoom } from './rooms.js?v=20260829-1';
+import { dataService } from './data-service.js?v=20260829-1';
 
 const cloud = document.querySelector('#wordCloud');
 const title = document.querySelector('#cloudTitle');
