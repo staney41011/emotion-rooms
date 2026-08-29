@@ -1,4 +1,4 @@
-import { getRoom } from './rooms.js?v=20260829-1';
+import { getRoom } from './rooms.js?v=20260829-2';
 import { dataService } from './data-service.js?v=20260829-1';
 
 const cloud = document.querySelector('#wordCloud');
