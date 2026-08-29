@@ -26,6 +26,18 @@
           <input class="input emotion-input" maxlength="12" placeholder="第三個感覺（選填）">
         </div>
         <p class="small-note" style="margin-top:10px">不用猜這間包廂想讓你感受到什麼，只寫你自己真的出現的感覺。</p>
+
+        <div style="margin-top:14px">
+          <button class="btn soft" id="moreEmotionsBtn" type="button" aria-expanded="false" aria-controls="emotionSuggestions">更多情緒</button>
+        </div>
+
+        <div id="emotionSuggestions" hidden style="margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.72)">
+          <div style="font-weight:900;margin-bottom:4px">想不到怎麼形容？可以參考這些詞</div>
+          <div class="small-note">沒有標準答案，只挑真正接近你感受的就好。</div>
+          <div class="chips" id="emotionChips"></div>
+          <div class="small-note" id="emotionSuggestionStatus" aria-live="polite" style="margin-top:10px"></div>
+        </div>
+
         <label class="form-label" for="comment">如果想多留一句話，可以寫下來 <span class="small-note">選填</span></label>
         <textarea id="comment" maxlength="180" placeholder="例如：我注意到自己一開始很想逃開，後來又有一點好奇。"></textarea>
         <div class="btn-row"><button class="btn primary" type="submit">送出我的感受</button></div>
