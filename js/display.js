@@ -4,7 +4,6 @@ import { dataService } from './data-service.js';
 const cloud = document.querySelector('#wordCloud');
 const title = document.querySelector('#cloudTitle');
 const count = document.querySelector('#submissionCount');
-let lastRenderedRoom = null;
 
 function aggregate(roomId) {
   const map = new Map();
@@ -24,7 +23,6 @@ function colorFor(index, total) {
 }
 
 function renderWaiting() {
-  lastRenderedRoom = 'waiting';
   title.innerHTML = '<h1>等待下一段體驗</h1><p>請依現場講師指示進行</p>';
   cloud.innerHTML = '<div class="cloud-empty" style="font-size:clamp(1.4rem,3vw,2.2rem)">完成體驗後，掃描現場 QR Code<br>寫下你真正出現的感受。</div>';
   count.textContent = '待機中';
@@ -37,7 +35,6 @@ function renderRoom(roomId) {
     return;
   }
 
-  lastRenderedRoom = roomId;
   title.innerHTML = `<h1>第 ${room.number} 間包廂</h1><p>大家剛才寫下的感受</p>`;
 
   const submissions = dataService.getSubmissions(roomId);
@@ -55,10 +52,13 @@ function renderRoom(roomId) {
     const span = document.createElement('span');
     span.className = 'cloud-word';
     span.textContent = word;
+
     const ratio = freq / max;
+    const rotation = index % 7 === 0 ? -3 : index % 11 === 0 ? 3 : 0;
     span.style.fontSize = `${26 + ratio * 64}px`;
     span.style.color = colorFor(index, words.length);
-    span.style.transform = `rotate(${index % 7 === 0 ? -3 : index % 11 === 0 ? 3 : 0}deg)`;
+    span.style.setProperty('--word-rotation', `${rotation}deg`);
+    span.style.animationDelay = `${Math.min(index * 32, 520)}ms`;
     span.title = `${freq} 次`;
     cloud.appendChild(span);
   });
