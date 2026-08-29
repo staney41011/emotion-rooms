@@ -11,9 +11,11 @@ const moreEmotionsBtn = document.querySelector('#moreEmotionsBtn');
 const emotionSuggestions = document.querySelector('#emotionSuggestions');
 const emotionChips = document.querySelector('#emotionChips');
 const emotionSuggestionStatus = document.querySelector('#emotionSuggestionStatus');
+const roomExperienceTitle = document.querySelector('#roomExperienceTitle');
 
 const roomId = new URLSearchParams(location.search).get('room');
 const currentRoom = getRoom(roomId);
+const chineseNumbers = ['', '一', '二', '三', '四', '五', '六', '七', '八'];
 
 function currentWords() {
   return inputs.map((input) => input.value.trim()).filter(Boolean);
@@ -61,6 +63,11 @@ function renderEmotionSuggestions() {
 if (!currentRoom || !ROOMS.some((room) => room.id === roomId)) {
   invalidRoom.hidden = false;
 } else {
+  const ordinal = chineseNumbers[currentRoom.number] || String(currentRoom.number);
+  const experienceTitle = `第${ordinal}個包廂情緒體驗`;
+  if (roomExperienceTitle) roomExperienceTitle.textContent = experienceTitle;
+  document.title = `${experienceTitle}｜情緒包廂`;
+
   document.documentElement.style.setProperty('--room-accent', currentRoom.accent);
   document.documentElement.style.setProperty('--room-soft', currentRoom.soft);
   roomHead.innerHTML = `<div><h1 style="margin-bottom:10px">寫下你剛剛的感受</h1><p>先不要替這段體驗找答案，也不用猜別人會怎麼寫。</p></div>`;
