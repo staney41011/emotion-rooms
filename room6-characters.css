@@ -30,8 +30,42 @@
 .mini-name{background:rgba(8,9,12,.82);color:#fff;border-radius:999px;padding:5px 10px;font-size:.78rem;font-weight:900;white-space:nowrap}
 .mini-mic{font-size:1.35rem}
 
+/* 真實照片版：GitHub assets/room6 */
+.story-screen .party-table{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  border-radius:0!important;box-shadow:none!important;
+  background-image:linear-gradient(rgba(0,0,0,.05),rgba(0,0,0,.30)),url('./assets/room6/vegetarian-hotpot.jpg')!important;
+  background-size:cover!important;background-position:center!important;
+}
+.story-screen .party-table:before{display:none!important}
+.story-screen .story-text{z-index:6;bottom:54px!important;text-shadow:0 3px 18px rgba(0,0,0,.9)!important}
+.story-screen .story-head,.story-screen .story-progress,.story-screen .story-nav{z-index:7!important}
+
+.perform-stage{
+  background-image:linear-gradient(rgba(0,0,0,.03),rgba(0,0,0,.20)),url('./assets/room6/dual-performance.jpg')!important;
+  background-size:cover!important;background-position:center 52%!important;
+}
+.perform-stage .spot,.perform-stage .performers{display:none!important}
+.perform-stage:before,.perform-stage:after{
+  position:absolute;bottom:18px;z-index:5;padding:7px 14px;border-radius:999px;
+  background:rgba(8,10,14,.72);color:#fff;font-weight:900;font-size:.9rem;
+  backdrop-filter:blur(8px);box-shadow:0 5px 20px rgba(0,0,0,.25)
+}
+.perform-stage:before{content:'阿哲';left:22%}
+.perform-stage:after{content:'你';right:23%}
+
+.stage-mini.enhanced-stage{
+  width:88%!important;height:64%!important;
+  background-image:linear-gradient(rgba(0,0,0,.02),rgba(0,0,0,.12)),url('./assets/room6/post-show-focus.jpg')!important;
+  background-size:cover!important;background-position:center 45%!important;
+}
+.stage-mini.enhanced-stage .mini-performer{display:none!important}
+.tag-focus{left:43%!important;top:39%!important;z-index:8!important}
+.story-card .story-comment{z-index:7!important;text-shadow:0 3px 16px rgba(0,0,0,.9)!important}
+
 @media(max-width:600px){
   .character-card{width:78px}.character-avatar{width:58px;height:58px;font-size:1.05rem}.character-name{font-size:.72rem;min-width:62px;padding:5px 8px}
   .performer.person-enhanced{width:120px!important}.stage-character-avatar{width:88px;height:88px;font-size:1.55rem}.stage-character-name{font-size:.88rem;padding:7px 14px}
   .mini-performer{width:76px}.mini-avatar-big{width:54px;height:54px}.mini-performer.you{left:17%}.mini-performer.azhe{right:17%}
+  .perform-stage:before{left:17%}.perform-stage:after{right:17%}
 }
