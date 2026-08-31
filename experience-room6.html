@@ -18,18 +18,75 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
   const fresh=Date.now();
   const base='https://raw.githubusercontent.com/staney41011/emotion-rooms/main/';
   try{
-    const [htmlRes,cssRes,jsRes]=await Promise.all([
-      fetch(`${base}experience-room6-content.html?_fresh=${fresh}`,{cache:'no-store'}),
+    const htmlRes=await fetch(`${base}experience-room6-content.html?_fresh=${fresh}`,{cache:'no-store'});
+    if(!htmlRes.ok) throw new Error('latest experience unavailable');
+    let html=await htmlRes.text();
+
+    let css='';
+    let helperJs='';
+    const helpers=await Promise.allSettled([
       fetch(`${base}room6-characters.css?_fresh=${fresh}`,{cache:'no-store'}),
       fetch(`${base}room6-characters.js?_fresh=${fresh}`,{cache:'no-store'})
     ]);
-    if(!htmlRes.ok||!cssRes.ok||!jsRes.ok) throw new Error('latest assets unavailable');
-    let html=await htmlRes.text();
-    const css=await cssRes.text();
-    let js=await jsRes.text();
-    html=html.replace('</head>',`<style id="room6-live-css">${css}</style></head>`);
-    js=js.replace(/<\/script/gi,'<\\/script');
-    html=html.replace('</body>',`<script id="room6-live-js">${js}<\/script></body>`);
+    if(helpers[0].status==='fulfilled' && helpers[0].value.ok) css=await helpers[0].value.text();
+    if(helpers[1].status==='fulfilled' && helpers[1].value.ok) helperJs=await helpers[1].value.text();
+
+    const directPhotoCss=`
+      .room6-direct-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;z-index:1!important;background:#111}
+      .party-table.room6-photo-ready{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;overflow:hidden!important;background:none!important}
+      .party-table.room6-photo-ready:before{display:none!important}
+      .perform-stage.room6-photo-ready{position:relative!important;overflow:hidden!important;background:none!important}
+      .perform-stage.room6-photo-ready .spot,.perform-stage.room6-photo-ready .performers{display:none!important}
+      .stage-mini.room6-photo-ready{position:relative!important;overflow:hidden!important;background:none!important}
+      .stage-mini.room6-photo-ready:before{display:none!important}
+      .room6-photo-error{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#15181d;color:#fff;text-align:center;padding:24px;font-weight:800}
+    `;
+    html=html.replace('</head>',`<style id="room6-live-css">${css}\n${directPhotoCss}</style></head>`);
+
+    const photoInjector=`(()=>{
+      const stamp=${fresh};
+      const photoBase='https://raw.githubusercontent.com/staney41011/emotion-rooms/main/assets/room6/';
+      function attach(parent,file,position='center'){
+        if(!parent || parent.dataset.room6Photo==='1') return;
+        parent.dataset.room6Photo='1';
+        parent.classList.add('room6-photo-ready');
+        const img=document.createElement('img');
+        img.className='room6-direct-photo';
+        img.alt='';
+        img.decoding='async';
+        img.loading='eager';
+        img.style.objectPosition=position;
+        img.src=photoBase+file+'?_fresh='+stamp;
+        img.addEventListener('error',()=>{
+          const err=document.createElement('div');
+          err.className='room6-photo-error';
+          err.textContent='照片讀取失敗：'+file;
+          parent.appendChild(err);
+        },{once:true});
+        parent.prepend(img);
+      }
+      function decorate(root=document){
+        const all=(selector)=>{
+          const list=[];
+          if(root.matches?.(selector)) list.push(root);
+          root.querySelectorAll?.(selector).forEach(el=>list.push(el));
+          return list;
+        };
+        all('.party-table').forEach(el=>attach(el,'vegetarian-hotpot.jpg','center'));
+        all('.perform-stage').forEach(el=>attach(el,'dual-performance.jpg','center 48%'));
+        all('.stage-mini').forEach(el=>attach(el,'post-show-focus.jpg','center 42%'));
+      }
+      const observer=new MutationObserver(records=>{
+        records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1) decorate(node)}));
+      });
+      const begin=()=>{decorate(document);observer.observe(document.body,{childList:true,subtree:true})};
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',begin,{once:true}); else begin();
+    })();`;
+
+    helperJs=helperJs.replace(/<\/script/gi,'<\\/script');
+    const safePhotoJs=photoInjector.replace(/<\/script/gi,'<\\/script');
+    html=html.replace('</body>',`<script id="room6-photo-injector">${safePhotoJs}<\/script><script id="room6-live-js">${helperJs}<\/script></body>`);
+
     document.open();
     document.write(html);
     document.close();
