@@ -1,0 +1,37 @@
+/* 第6間人物辨識強化：只負責讓角色更直觀，不改情緒腳本 */
+.walker.person-enhanced .head,
+.walker.person-enhanced .body{opacity:0!important}
+.walker.person-enhanced.friend:after{display:none!important}
+.walker.person-enhanced{width:96px!important;height:174px!important}
+.character-card{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:92px;display:flex;flex-direction:column;align-items:center;gap:7px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.18))}
+.character-avatar{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;background:#64748b;color:#fff;font-size:1.35rem;font-weight:950;border:4px solid rgba(255,255,255,.92);box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.character-name{min-width:74px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.96);color:#17202a;font-size:.82rem;font-weight:950;text-align:center;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.character-card.jiayi .character-avatar{background:#b66d8b}
+.character-card.student-a .character-avatar{background:#667d9e}
+.character-card.student-b .character-avatar{background:#668b67}
+
+.performer.person-enhanced .head,
+.performer.person-enhanced .body{opacity:0!important}
+.performer.person-enhanced{width:150px!important;height:300px!important}
+.stage-character-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px}
+.stage-character-avatar{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:2rem;font-weight:950;border:5px solid rgba(255,255,255,.9);box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.stage-character-card.you .stage-character-avatar{background:#5f7fb8}
+.stage-character-card.azhe .stage-character-avatar{background:#9c6078}
+.stage-character-name{padding:8px 18px;border-radius:999px;background:#fff;color:#12151a;font-weight:950;font-size:1rem;box-shadow:0 8px 22px rgba(0,0,0,.25)}
+.stage-character-mic{font-size:2.1rem;margin-bottom:3px}
+
+.stage-mini.enhanced-stage:before{display:none!important}
+.mini-performer{position:absolute;bottom:18%;width:92px;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2}
+.mini-performer.you{left:20%}
+.mini-performer.azhe{right:20%}
+.mini-avatar-big{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:950;border:3px solid rgba(255,255,255,.92);box-shadow:0 7px 18px rgba(0,0,0,.3)}
+.mini-performer.you .mini-avatar-big{background:#5f7fb8}
+.mini-performer.azhe .mini-avatar-big{background:#9c6078}
+.mini-name{background:rgba(8,9,12,.82);color:#fff;border-radius:999px;padding:5px 10px;font-size:.78rem;font-weight:900;white-space:nowrap}
+.mini-mic{font-size:1.35rem}
+
+@media(max-width:600px){
+  .character-card{width:78px}.character-avatar{width:58px;height:58px;font-size:1.05rem}.character-name{font-size:.72rem;min-width:62px;padding:5px 8px}
+  .performer.person-enhanced{width:120px!important}.stage-character-avatar{width:88px;height:88px;font-size:1.55rem}.stage-character-name{font-size:.88rem;padding:7px 14px}
+  .mini-performer{width:76px}.mini-avatar-big{width:54px;height:54px}.mini-performer.you{left:17%}.mini-performer.azhe{right:17%}
+}
