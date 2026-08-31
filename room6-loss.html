@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>第6間體驗</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif}body{display:grid;place-items:center}.loading{text-align:center;color:#8f99a5}.loading b{display:block;color:#eef2f6;font-size:1.25rem;margin-bottom:8px}.retry{margin-top:18px;border:1px solid #343a40;background:#11161b;color:#eef2f6;border-radius:12px;padding:10px 16px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="loading" id="loading"><b>第6間體驗</b>正在讀取最新版本…</div>
+<script>
+(async()=>{
+  const fresh=Date.now();
+  const rawBase='https://raw.githubusercontent.com/staney41011/emotion-rooms/main/';
+  const photoBase=new URL('assets/room6/',location.href).href;
+  try{
+    const htmlRes=await fetch(`${rawBase}experience-room6-content.html?_fresh=${fresh}`,{cache:'no-store'});
+    if(!htmlRes.ok) throw new Error('latest experience unavailable');
+    let html=await htmlRes.text();
+
+    let helperCss='';
+    let helperJs='';
+    const helpers=await Promise.allSettled([
+      fetch(`${rawBase}room6-characters.css?_fresh=${fresh}`,{cache:'no-store'}),
+      fetch(`${rawBase}room6-characters.js?_fresh=${fresh}`,{cache:'no-store'})
+    ]);
+    if(helpers[0].status==='fulfilled'&&helpers[0].value.ok) helperCss=await helpers[0].value.text();
+    if(helpers[1].status==='fulfilled'&&helpers[1].value.ok) helperJs=await helpers[1].value.text();
+
+    const hotpot=`${photoBase}vegetarian-hotpot.jpg?_fresh=${fresh}`;
+    const performance=`${photoBase}dual-performance.jpg?_fresh=${fresh}`;
+    const focus=`${photoBase}post-show-focus.jpg?_fresh=${fresh}`;
+
+    // 照片直接寫進各幕產生的 HTML，不等待外掛 JS 後補。
+    html=html.replace('<div class="party-table"></div>',`<div class="party-table room6-native-photo"><img class="room6-native-img" src="${hotpot}" alt="" loading="eager" decoding="async"></div>`);
+    html=html.replace('<div class="perform-stage">',`<div class="perform-stage room6-native-photo"><img class="room6-native-img" src="${performance}" alt="" loading="eager" decoding="async">`);
+    html=html.replace('<div class="stage-mini"></div>',`<div class="stage-mini room6-native-photo"><img class="room6-native-img" src="${focus}" alt="" loading="eager" decoding="async"></div>`);
+
+    const directCss=`
+      .room6-native-photo{position:relative!important;overflow:hidden!important;background:#111!important}
+      .room6-native-img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;z-index:2!important}
+      .story-screen .party-table.room6-native-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}
+      .story-screen .party-table.room6-native-photo:before{display:none!important}
+      .story-screen .story-head,.story-screen .story-progress,.story-screen .story-text,.story-screen .story-nav{z-index:8!important}
+      .perform-stage.room6-native-photo{background:#111!important}
+      .perform-stage.room6-native-photo .spot,.perform-stage.room6-native-photo .performers{display:none!important}
+      .perform-stage.room6-native-photo:before{content:'你';left:23%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
+      .perform-stage.room6-native-photo:after{content:'阿哲';right:22%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
+      .stage-mini.room6-native-photo{width:88%!important;height:64%!important;background:#111!important}
+      .stage-mini.room6-native-photo:before{display:none!important}
+      .stage-mini.room6-native-photo .mini-performer{display:none!important}
+      .story-card .story-head,.story-card .story-comment,.story-card .story-nav,.story-card .tag-focus,.story-card .story-progress{z-index:8!important}
+    `;
+    html=html.replace('</head>',`<style id="room6-live-css">${helperCss}\n${directCss}</style></head>`);
+
+    helperJs=helperJs.replace(/<\/script/gi,'<\\/script');
+    html=html.replace('</body>',`<script id="room6-live-js">${helperJs}<\/script></body>`);
+
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(error){
+    document.querySelector('#loading').innerHTML='<b>讀取失敗</b>請確認網路後再試一次。<br><button class="retry" onclick="location.reload()">重新讀取</button>';
+  }
+})();
+window.addEventListener('pageshow',(event)=>{if(event.persisted)location.reload()});
+</script>
+</body>
+</html>
