@@ -30,11 +30,11 @@
 .mini-name{background:rgba(8,9,12,.82);color:#fff;border-radius:999px;padding:5px 10px;font-size:.78rem;font-weight:900;white-space:nowrap}
 .mini-mic{font-size:1.35rem}
 
-/* 真實照片版：GitHub assets/room6 */
+/* 真實照片版：直接讀 GitHub main raw，避開 Pages 同步延遲 */
 .story-screen .party-table{
   position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
   border-radius:0!important;box-shadow:none!important;
-  background-image:linear-gradient(rgba(0,0,0,.05),rgba(0,0,0,.30)),url('./assets/room6/vegetarian-hotpot.jpg')!important;
+  background-image:linear-gradient(rgba(0,0,0,.05),rgba(0,0,0,.30)),url('https://raw.githubusercontent.com/staney41011/emotion-rooms/main/assets/room6/vegetarian-hotpot.jpg')!important;
   background-size:cover!important;background-position:center!important;
 }
 .story-screen .party-table:before{display:none!important}
@@ -42,7 +42,7 @@
 .story-screen .story-head,.story-screen .story-progress,.story-screen .story-nav{z-index:7!important}
 
 .perform-stage{
-  background-image:linear-gradient(rgba(0,0,0,.03),rgba(0,0,0,.20)),url('./assets/room6/dual-performance.jpg')!important;
+  background-image:linear-gradient(rgba(0,0,0,.03),rgba(0,0,0,.20)),url('https://raw.githubusercontent.com/staney41011/emotion-rooms/main/assets/room6/dual-performance.jpg')!important;
   background-size:cover!important;background-position:center 52%!important;
 }
 .perform-stage .spot,.perform-stage .performers{display:none!important}
@@ -56,7 +56,7 @@
 
 .stage-mini.enhanced-stage{
   width:88%!important;height:64%!important;
-  background-image:linear-gradient(rgba(0,0,0,.02),rgba(0,0,0,.12)),url('./assets/room6/post-show-focus.jpg')!important;
+  background-image:linear-gradient(rgba(0,0,0,.02),rgba(0,0,0,.12)),url('https://raw.githubusercontent.com/staney41011/emotion-rooms/main/assets/room6/post-show-focus.jpg')!important;
   background-size:cover!important;background-position:center 45%!important;
 }
 .stage-mini.enhanced-stage .mini-performer{display:none!important}
