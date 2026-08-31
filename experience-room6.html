@@ -16,10 +16,13 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
 <script>
 (async()=>{
   const source='https://raw.githubusercontent.com/staney41011/emotion-rooms/main/experience-room6-content.html';
+  const fresh=Date.now();
   try{
-    const response=await fetch(`${source}?_fresh=${Date.now()}`,{cache:'no-store'});
+    const response=await fetch(`${source}?_fresh=${fresh}`,{cache:'no-store'});
     if(!response.ok) throw new Error(`HTTP ${response.status}`);
-    const html=await response.text();
+    let html=await response.text();
+    html=html.replace('</head>',`<link rel="stylesheet" href="https://staney41011.github.io/emotion-rooms/room6-characters.css?_fresh=${fresh}"></head>`);
+    html=html.replace('</body>',`<script src="https://staney41011.github.io/emotion-rooms/room6-characters.js?_fresh=${fresh}"><\/script></body>`);
     document.open();
     document.write(html);
     document.close();
