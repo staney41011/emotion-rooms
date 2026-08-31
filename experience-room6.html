@@ -15,14 +15,21 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
 <div class="loading" id="loading"><b>第6間體驗</b>正在讀取最新版本…</div>
 <script>
 (async()=>{
-  const source='https://raw.githubusercontent.com/staney41011/emotion-rooms/main/experience-room6-content.html';
   const fresh=Date.now();
+  const base='https://raw.githubusercontent.com/staney41011/emotion-rooms/main/';
   try{
-    const response=await fetch(`${source}?_fresh=${fresh}`,{cache:'no-store'});
-    if(!response.ok) throw new Error(`HTTP ${response.status}`);
-    let html=await response.text();
-    html=html.replace('</head>',`<link rel="stylesheet" href="https://staney41011.github.io/emotion-rooms/room6-characters.css?_fresh=${fresh}"></head>`);
-    html=html.replace('</body>',`<script src="https://staney41011.github.io/emotion-rooms/room6-characters.js?_fresh=${fresh}"><\/script></body>`);
+    const [htmlRes,cssRes,jsRes]=await Promise.all([
+      fetch(`${base}experience-room6-content.html?_fresh=${fresh}`,{cache:'no-store'}),
+      fetch(`${base}room6-characters.css?_fresh=${fresh}`,{cache:'no-store'}),
+      fetch(`${base}room6-characters.js?_fresh=${fresh}`,{cache:'no-store'})
+    ]);
+    if(!htmlRes.ok||!cssRes.ok||!jsRes.ok) throw new Error('latest assets unavailable');
+    let html=await htmlRes.text();
+    const css=await cssRes.text();
+    let js=await jsRes.text();
+    html=html.replace('</head>',`<style id="room6-live-css">${css}</style></head>`);
+    js=js.replace(/<\/script/gi,'<\\/script');
+    html=html.replace('</body>',`<script id="room6-live-js">${js}<\/script></body>`);
     document.open();
     document.write(html);
     document.close();
