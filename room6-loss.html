@@ -42,19 +42,43 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
     html=html.replace('<div class="stage-mini"></div>',`<div class="stage-mini room6-native-photo"><img class="room6-native-img" src="${focus}" alt="" loading="eager" decoding="async"></div>`);
 
     const directCss=`
-      .room6-native-photo{position:relative!important;overflow:hidden!important;background:#111!important}
-      .room6-native-img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;z-index:2!important}
-      .story-screen .party-table.room6-native-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}
+      /* 保留原圖內容，只修顯示尺寸與裁切，避免低解析照片被過度放大 */
+      .room6-native-photo{position:relative!important;overflow:hidden!important;background:#0b0d10!important}
+      .room6-native-img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;display:block!important;z-index:2!important;image-rendering:auto!important;filter:contrast(1.025) saturate(1.015)!important;transform:none!important}
+
+      /* 火鍋照維持原本直式限動感，不再硬放大裁切 */
+      .story-screen .party-table.room6-native-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important;background:#090b0e!important}
       .story-screen .party-table.room6-native-photo:before{display:none!important}
+      .story-screen .party-table.room6-native-photo .room6-native-img{object-fit:contain!important}
       .story-screen .story-head,.story-screen .story-progress,.story-screen .story-text,.story-screen .story-nav{z-index:8!important}
-      .perform-stage.room6-native-photo{background:#111!important}
+
+      /* 兩人表演：恢復直式照片比例，完整顯示，不再塞進橫式舞台框 */
+      .perform-stage.room6-native-photo{width:min(430px,88vw)!important;height:min(764px,82vh)!important;aspect-ratio:320/568!important;border-radius:26px!important;background:#090b0e!important;box-shadow:0 28px 80px rgba(0,0,0,.55)!important}
+      .perform-stage.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
       .perform-stage.room6-native-photo .spot,.perform-stage.room6-native-photo .performers{display:none!important}
-      .perform-stage.room6-native-photo:before{content:'你';left:23%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
-      .perform-stage.room6-native-photo:after{content:'阿哲';right:22%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
-      .stage-mini.room6-native-photo{width:88%!important;height:64%!important;background:#111!important}
+      .perform-stage.room6-native-photo:before{content:'你';left:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
+      .perform-stage.room6-native-photo:after{content:'阿哲';right:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
+
+      /* 表演後限動照也照原本直式照片呈現，避免裁掉人物 */
+      .stage-mini.room6-native-photo{height:66%!important;width:auto!important;aspect-ratio:320/568!important;background:#090b0e!important;border-radius:18px!important}
+      .stage-mini.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
       .stage-mini.room6-native-photo:before{display:none!important}
       .stage-mini.room6-native-photo .mini-performer{display:none!important}
       .story-card .story-head,.story-card .story-comment,.story-card .story-nav,.story-card .tag-focus,.story-card .story-progress{z-index:8!important}
+
+      /* 沒等我先離開：照片比例就是 16:9，限制顯示尺寸避免 240px 圖被拉到 1000px */
+      .walk-wrap{width:min(640px,94vw)!important;height:auto!important;aspect-ratio:16/9!important;max-height:72vh!important}
+      .walk-scene{border-radius:24px!important}
+      .walk-photo{transform:none!important;background:#090b0e!important}
+      .walk-photo.show{transform:none!important}
+      .walk-photo img{object-fit:contain!important;object-position:center!important;transform:none!important;image-rendering:auto!important;filter:contrast(1.035) saturate(1.015)!important}
+      .walk-photo.show img{transform:none!important}
+      .walk-card-overlay{font-size:.78rem!important;padding:7px 10px!important}
+
+      @media(max-width:600px){
+        .perform-stage.room6-native-photo{width:min(400px,91vw)!important;height:min(710px,78vh)!important}
+        .walk-wrap{width:min(560px,94vw)!important}
+      }
     `;
     html=html.replace('</head>',`<style id="room6-live-css">${helperCss}\n${directCss}</style></head>`);
 
