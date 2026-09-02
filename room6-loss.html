@@ -12,84 +12,76 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
 </style>
 </head>
 <body>
-<div class="loading" id="loading"><b>第6間體驗</b>正在讀取最新版本…</div>
+<div class="loading" id="loading"><b>第6間體驗</b>正在讀取…</div>
 <script>
 (async()=>{
   const fresh=Date.now();
-  const rawBase='https://raw.githubusercontent.com/staney41011/emotion-rooms/main/';
-  const photoBase=new URL('assets/room6/',location.href).href;
+  const base=new URL('.',location.href);
+  const fetchText=async(path)=>{
+    const url=new URL(path,base);
+    url.searchParams.set('v',fresh);
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok) throw new Error(`${path}: ${res.status}`);
+    return res.text();
+  };
+  const dataAvif=async(paths)=>'data:image/avif;base64,'+(await Promise.all(paths.map(fetchText))).join('');
   try{
-    const htmlRes=await fetch(`${rawBase}experience-room6-content.html?_fresh=${fresh}`,{cache:'no-store'});
-    if(!htmlRes.ok) throw new Error('latest experience unavailable');
-    let html=await htmlRes.text();
-
-    let helperCss='';
-    let helperJs='';
-    const helpers=await Promise.allSettled([
-      fetch(`${rawBase}room6-characters.css?_fresh=${fresh}`,{cache:'no-store'}),
-      fetch(`${rawBase}room6-characters.js?_fresh=${fresh}`,{cache:'no-store'})
+    const [htmlSource,helperCss,helperJs,performance,focus,hotpot,walkChat,walkPack,walkBacks,walkNotice]=await Promise.all([
+      fetchText('experience-room6-content.html'),
+      fetchText('room6-characters.css'),
+      fetchText('room6-characters.js'),
+      dataAvif(['assets/room6/hq4/dual-performance.avif.part01.b64','assets/room6/hq4/dual-performance.avif.part02.b64']),
+      dataAvif(['assets/room6/hq4/post-show-focus.avif.part01.b64','assets/room6/hq4/post-show-focus.avif.part02.b64']),
+      dataAvif(['assets/room6/hq4/vegetarian-hotpot.avif.part01.b64']),
+      dataAvif(['assets/room6/hq4/walk-chat-classroom.avif.b64']),
+      dataAvif(['assets/room6/hq4/walk-pack-bag.avif.b64']),
+      dataAvif(['assets/room6/hq4/walk-group-backs.avif.b64']),
+      dataAvif(['assets/room6/hq4/walk-final-notice.avif.b64'])
     ]);
-    if(helpers[0].status==='fulfilled'&&helpers[0].value.ok) helperCss=await helpers[0].value.text();
-    if(helpers[1].status==='fulfilled'&&helpers[1].value.ok) helperJs=await helpers[1].value.text();
+    let html=htmlSource;
+    const photo=(src,cls='room6-native-img')=>`<img class="${cls}" src="${src}" alt="" loading="eager" decoding="async">`;
 
-    const hotpot=`${photoBase}vegetarian-hotpot.jpg?_fresh=${fresh}`;
-    const performance=`${photoBase}dual-performance.jpg?_fresh=${fresh}`;
-    const focus=`${photoBase}post-show-focus.jpg?_fresh=${fresh}`;
+    html=html.replace('<div class="party-table"></div>',`<div class="party-table room6-native-photo">${photo(hotpot)}</div>`);
+    html=html.replace('<div class="perform-stage">',`<div class="perform-stage room6-native-photo">${photo(performance)}`);
+    html=html.replace('<div class="stage-mini"></div>',`<div class="stage-mini room6-native-photo">${photo(focus)}</div>`);
 
-    // 照片直接寫進各幕產生的 HTML，不等待外掛 JS 後補。
-    html=html.replace('<div class="party-table"></div>',`<div class="party-table room6-native-photo"><img class="room6-native-img" src="${hotpot}" alt="" loading="eager" decoding="async"></div>`);
-    html=html.replace('<div class="perform-stage">',`<div class="perform-stage room6-native-photo"><img class="room6-native-img" src="${performance}" alt="" loading="eager" decoding="async">`);
-    html=html.replace('<div class="stage-mini"></div>',`<div class="stage-mini room6-native-photo"><img class="room6-native-img" src="${focus}" alt="" loading="eager" decoding="async"></div>`);
+    const walkSources={'walk-chat-classroom':walkChat,'walk-pack-bag':walkPack,'walk-group-backs':walkBacks,'walk-final-notice':walkNotice};
+    for(const [name,src] of Object.entries(walkSources)){
+      const re=new RegExp(`<img[^>]*src=["'][^"']*${name}\\.(?:jpg|jpeg|png|avif)[^"']*["'][^>]*>`,'gi');
+      html=html.replace(re,photo(src,'room6-walk-img'));
+    }
 
     const directCss=`
-      /* 保留原圖內容，只修顯示尺寸與裁切，避免低解析照片被過度放大 */
-      .room6-native-photo{position:relative!important;overflow:hidden!important;background:#0b0d10!important}
-      .room6-native-img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;display:block!important;z-index:2!important;image-rendering:auto!important;filter:contrast(1.025) saturate(1.015)!important;transform:none!important}
-
-      /* 火鍋照維持原本直式限動感，不再硬放大裁切 */
+      .room6-native-photo{position:relative!important;overflow:hidden!important;background:#090b0e!important}
+      .room6-native-img,.room6-walk-img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;z-index:2!important;image-rendering:auto!important}
       .story-screen .party-table.room6-native-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important;background:#090b0e!important}
       .story-screen .party-table.room6-native-photo:before{display:none!important}
-      .story-screen .party-table.room6-native-photo .room6-native-img{object-fit:contain!important}
+      .story-screen .party-table.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
       .story-screen .story-head,.story-screen .story-progress,.story-screen .story-text,.story-screen .story-nav{z-index:8!important}
-
-      /* 兩人表演：恢復直式照片比例，完整顯示，不再塞進橫式舞台框 */
-      .perform-stage.room6-native-photo{width:min(430px,88vw)!important;height:min(764px,82vh)!important;aspect-ratio:320/568!important;border-radius:26px!important;background:#090b0e!important;box-shadow:0 28px 80px rgba(0,0,0,.55)!important}
+      .perform-stage.room6-native-photo{width:min(430px,88vw)!important;height:min(764px,82vh)!important;aspect-ratio:800/1421!important;border-radius:26px!important;background:#090b0e!important;box-shadow:0 28px 80px rgba(0,0,0,.55)!important}
       .perform-stage.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
       .perform-stage.room6-native-photo .spot,.perform-stage.room6-native-photo .performers{display:none!important}
       .perform-stage.room6-native-photo:before{content:'你';left:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
       .perform-stage.room6-native-photo:after{content:'阿哲';right:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
-
-      /* 表演後限動照也照原本直式照片呈現，避免裁掉人物 */
-      .stage-mini.room6-native-photo{height:66%!important;width:auto!important;aspect-ratio:320/568!important;background:#090b0e!important;border-radius:18px!important}
+      .stage-mini.room6-native-photo{height:66%!important;width:auto!important;aspect-ratio:800/1421!important;background:#090b0e!important;border-radius:18px!important}
       .stage-mini.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
-      .stage-mini.room6-native-photo:before{display:none!important}
-      .stage-mini.room6-native-photo .mini-performer{display:none!important}
+      .stage-mini.room6-native-photo:before,.stage-mini.room6-native-photo .mini-performer{display:none!important}
       .story-card .story-head,.story-card .story-comment,.story-card .story-nav,.story-card .tag-focus,.story-card .story-progress{z-index:8!important}
-
-      /* 沒等我先離開：照片比例就是 16:9，限制顯示尺寸避免 240px 圖被拉到 1000px */
-      .walk-wrap{width:min(640px,94vw)!important;height:auto!important;aspect-ratio:16/9!important;max-height:72vh!important}
+      .walk-wrap{width:min(720px,94vw)!important;height:auto!important;aspect-ratio:16/9!important;max-height:72vh!important}
       .walk-scene{border-radius:24px!important}
-      .walk-photo{transform:none!important;background:#090b0e!important}
-      .walk-photo.show{transform:none!important}
-      .walk-photo img{object-fit:contain!important;object-position:center!important;transform:none!important;image-rendering:auto!important;filter:contrast(1.035) saturate(1.015)!important}
-      .walk-photo.show img{transform:none!important}
+      .walk-photo,.walk-photo.show{transform:none!important;background:#090b0e!important}
+      .walk-photo .room6-walk-img{object-fit:cover!important;object-position:center!important;transform:none!important}
+      .walk-photo.show .room6-walk-img{transform:none!important}
       .walk-card-overlay{font-size:.78rem!important;padding:7px 10px!important}
-
-      @media(max-width:600px){
-        .perform-stage.room6-native-photo{width:min(400px,91vw)!important;height:min(710px,78vh)!important}
-        .walk-wrap{width:min(560px,94vw)!important}
-      }
+      @media(max-width:600px){.perform-stage.room6-native-photo{width:min(400px,91vw)!important;height:min(710px,78vh)!important}.walk-wrap{width:min(640px,94vw)!important}}
     `;
-    html=html.replace('</head>',`<style id="room6-live-css">${helperCss}\n${directCss}</style></head>`);
-
-    helperJs=helperJs.replace(/<\/script/gi,'<\\/script');
-    html=html.replace('</body>',`<script id="room6-live-js">${helperJs}<\/script></body>`);
-
-    document.open();
-    document.write(html);
-    document.close();
+    html=html.replace('</head>',`<style id="room6-local-css">${helperCss}\n${directCss}</style></head>`);
+    const safeHelperJs=helperJs.replace(/<\/script/gi,'<\\/script');
+    html=html.replace('</body>',`<script id="room6-local-js">${safeHelperJs}<\/script></body>`);
+    document.open();document.write(html);document.close();
   }catch(error){
-    document.querySelector('#loading').innerHTML='<b>讀取失敗</b>請確認網路後再試一次。<br><button class="retry" onclick="location.reload()">重新讀取</button>';
+    console.error(error);
+    document.querySelector('#loading').innerHTML='<b>讀取失敗</b>請重新整理後再試一次。<br><button class="retry" onclick="location.reload()">重新讀取</button>';
   }
 })();
 window.addEventListener('pageshow',(event)=>{if(event.persisted)location.reload()});
