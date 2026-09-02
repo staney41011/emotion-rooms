@@ -25,6 +25,7 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
     return res.text();
   };
   const dataAvif=async(paths)=>'data:image/avif;base64,'+(await Promise.all(paths.map(fetchText))).join('');
+  const dataJpeg=async(paths)=>'data:image/jpeg;base64,'+(await Promise.all(paths.map(fetchText))).join('');
   const assetUrl=(path)=>{const u=new URL(path,base);u.searchParams.set('v',fresh);return u.href};
   try{
     const [htmlSource,helperCss,helperJs,performance,focus,hotpot,walkChat,walkPack,walkBacks,walkNotice]=await Promise.all([
@@ -33,13 +34,15 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
       fetchText('room6-characters.js'),
       dataAvif(['assets/room6/hq4/dual-performance.avif.part01.b64','assets/room6/hq4/dual-performance.avif.part02.b64']),
       dataAvif(['assets/room6/hq4/post-show-focus.avif.part01.b64','assets/room6/hq4/post-show-focus.avif.part02.b64']),
-      Promise.resolve(assetUrl('assets/room6/hq5/vegetarian-hotpot.avif')),
+      dataJpeg(['assets/room6/hq6/vegetarian-hotpot.part01.b64','assets/room6/hq6/vegetarian-hotpot.part02.b64','assets/room6/hq6/vegetarian-hotpot.part03.b64','assets/room6/hq6/vegetarian-hotpot.part04.b64']),
       Promise.resolve(assetUrl('assets/room6/hq5/walk-chat-classroom.avif')),
       dataAvif(['assets/room6/hq5/walk-pack-bag.b64']),
       dataAvif(['assets/room6/hq5/walk-group-backs.b64']),
       dataAvif(['assets/room6/hq4/walk-final-notice.avif.b64'])
     ]);
-    let html=htmlSource;
+    let html=htmlSource
+      .replace('星期日 · 8月30日','星期五 · 9月4日')
+      .replace('星期一 · 8月31日','星期六 · 9月5日');
     const photo=(src,cls='room6-native-img')=>`<img class="${cls}" src="${src}" alt="" loading="eager" decoding="async">`;
     html=html.replace('<div class="party-table"></div>',`<div class="party-table room6-native-photo">${photo(hotpot)}</div>`);
     html=html.replace('<div class="perform-stage">',`<div class="perform-stage room6-native-photo">${photo(performance)}`);
