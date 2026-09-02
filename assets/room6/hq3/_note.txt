@@ -1,0 +1,1 @@
+hq assets are split into text chunks for lossless transport through repository text writes
