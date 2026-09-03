@@ -6,41 +6,45 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>包廂 QR Code｜講師用</title>
-  <link rel="stylesheet" href="css/style.css?v=20260903-1">
+  <link rel="stylesheet" href="css/style.css?v=20260903-2">
   <style>
     .qr-toolbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
     .qr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
     .qr-card{background:#fff;border:1px solid rgba(20,28,48,.12);border-radius:24px;padding:26px;text-align:center;break-inside:avoid}
     .qr-card h2{font-size:2rem;margin:0 0 6px}.qr-order{color:#8a91a2;font-size:.85rem;font-weight:800}.qr-box{display:flex;justify-content:center;margin:18px auto 20px}.qr-url{font-size:.78rem;word-break:break-all;color:#6b7280}.teacher-only{margin-top:12px;font-size:.9rem;color:#6b7280}
+    .qr-box canvas,.qr-box img{max-width:100%;height:auto}
     @media(max-width:720px){.qr-grid{grid-template-columns:1fr}}
-    @page{size:A4 portrait;margin:12mm}
+
+    @page{size:A4 portrait;margin:0}
     @media print{
-      html,body{background:#fff!important;margin:0!important;padding:0!important}
+      html,body{width:210mm!important;height:auto!important;background:#fff!important;margin:0!important;padding:0!important}
       .topbar,.qr-toolbar,.teacher-only,.qr-url{display:none!important}
-      .shell{max-width:none!important;width:100%!important;margin:0!important;padding:0!important}
-      .qr-grid{display:block!important;margin:0!important;padding:0!important}
+      .shell{max-width:none!important;width:210mm!important;margin:0!important;padding:0!important}
+      .qr-grid{display:block!important;width:210mm!important;margin:0!important;padding:0!important}
       .qr-card{
         box-sizing:border-box!important;
-        width:100%!important;
-        height:273mm!important;
+        width:210mm!important;
+        height:297mm!important;
         margin:0!important;
-        padding:18mm 12mm!important;
+        padding:12mm 0 8mm!important;
         border:0!important;
         border-radius:0!important;
+        background:#fff!important;
         display:flex!important;
         flex-direction:column!important;
         align-items:center!important;
         justify-content:center!important;
+        overflow:hidden!important;
         break-inside:avoid!important;
         page-break-inside:avoid!important;
         break-after:page!important;
         page-break-after:always!important;
       }
       .qr-card:last-child{break-after:auto!important;page-break-after:auto!important}
-      .qr-order{font-size:18pt!important;margin-bottom:5mm!important;color:#555!important}
-      .qr-card h2{font-size:34pt!important;line-height:1.2!important;margin:0 0 10mm!important;color:#111!important}
-      .qr-box{margin:0!important}
-      .qr-box canvas,.qr-box img{width:95mm!important;height:95mm!important;image-rendering:pixelated!important}
+      .qr-order{font-size:15pt!important;line-height:1!important;margin:0 0 3mm!important;color:#555!important}
+      .qr-card h2{font-size:36pt!important;line-height:1.12!important;margin:0 0 7mm!important;color:#000!important;font-weight:900!important}
+      .qr-box{width:185mm!important;height:185mm!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+      .qr-box canvas,.qr-box img{width:185mm!important;height:185mm!important;max-width:none!important;image-rendering:pixelated!important}
     }
   </style>
 </head>
@@ -48,7 +52,7 @@
   <main class="shell">
     <div class="topbar"><div class="brand"><span class="brand-mark">QR</span> 包廂 QR Code</div><span class="small-note">講師用</span></div>
     <div class="qr-toolbar">
-      <div><h1 style="margin:0 0 8px">6 間包廂 QR Code</h1><div class="small-note">會使用你在講師控制台輸入的包廂名稱。列印時每頁只會有 1 個 QR Code，共 6 頁。</div></div>
+      <div><h1 style="margin:0 0 8px">6 間包廂 QR Code</h1><div class="small-note">列印時每頁只會有 1 個大型 QR Code，共 6 頁。建議列印設定關閉「頁首及頁尾」。</div></div>
       <button class="btn primary" type="button" onclick="window.print()">列印 QR Code</button>
     </div>
     <section class="qr-grid" id="qrGrid"></section>
@@ -62,7 +66,7 @@
     const grid = document.querySelector('#qrGrid');
     const labels = getRoomLabels(location.search);
     const STUDENT_URL = new URL('student.html', location.href).href;
-    const SITE_VERSION = '20260903-1';
+    const SITE_VERSION = '20260903-2';
 
     ROOMS.forEach((room) => {
       const label = labels[room.id] || `第 ${room.number} 間包廂`;
@@ -84,8 +88,8 @@
 
       new QRCode(document.querySelector(`#qr-${room.id}`), {
         text: url.href,
-        width: 360,
-        height: 360,
+        width: 900,
+        height: 900,
         correctLevel: QRCode.CorrectLevel.M
       });
     });
