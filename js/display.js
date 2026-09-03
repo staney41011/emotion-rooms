@@ -1,5 +1,6 @@
-import { getRoom } from './rooms.js?v=20260829-2';
-import { dataService } from './data-service.js?v=20260829-1';
+import { getRoom } from './rooms.js?v=20260903-1';
+import { getRoomLabel } from './room-labels.js?v=20260903-1';
+import { dataService } from './data-service.js?v=20260903-1';
 
 const cloud = document.querySelector('#wordCloud');
 const title = document.querySelector('#cloudTitle');
@@ -35,7 +36,7 @@ function renderRoom(roomId) {
     return;
   }
 
-  title.innerHTML = `<h1>第 ${room.number} 間包廂</h1><p>大家剛才寫下的感受</p>`;
+  title.innerHTML = `<h1>${getRoomLabel(room.id)}</h1><p>大家剛才寫下的感受</p>`;
 
   const submissions = dataService.getSubmissions(roomId);
   count.textContent = `${submissions.length} 份投稿`;
@@ -52,7 +53,6 @@ function renderRoom(roomId) {
     const span = document.createElement('span');
     span.className = 'cloud-word';
     span.textContent = word;
-
     const ratio = freq / max;
     const rotation = index % 7 === 0 ? -3 : index % 11 === 0 ? 3 : 0;
     span.style.fontSize = `${26 + ratio * 64}px`;
@@ -66,13 +66,11 @@ function renderRoom(roomId) {
 
 function render() {
   const currentRoom = dataService.getCurrentRoom();
-  if (currentRoom === 'waiting') {
-    renderWaiting();
-  } else {
-    renderRoom(currentRoom);
-  }
+  if (currentRoom === 'waiting') renderWaiting();
+  else renderRoom(currentRoom);
 }
 
 dataService.subscribe(render);
+window.addEventListener('emotion-room-labels-changed', render);
 document.querySelector('#fullscreenBtn').addEventListener('click', () => document.documentElement.requestFullscreen?.());
 render();
