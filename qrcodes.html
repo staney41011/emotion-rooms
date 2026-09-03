@@ -11,16 +11,44 @@
     .qr-toolbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
     .qr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
     .qr-card{background:#fff;border:1px solid rgba(20,28,48,.12);border-radius:24px;padding:26px;text-align:center;break-inside:avoid}
-    .qr-card h2{font-size:2rem;margin:0 0 6px}.qr-order{color:#8a91a2;font-size:.85rem;font-weight:800}.qr-box{display:flex;justify-content:center;margin:14px auto 18px}.qr-url{font-size:.78rem;word-break:break-all;color:#6b7280}.teacher-only{margin-top:12px;font-size:.9rem;color:#6b7280}
+    .qr-card h2{font-size:2rem;margin:0 0 6px}.qr-order{color:#8a91a2;font-size:.85rem;font-weight:800}.qr-box{display:flex;justify-content:center;margin:18px auto 20px}.qr-url{font-size:.78rem;word-break:break-all;color:#6b7280}.teacher-only{margin-top:12px;font-size:.9rem;color:#6b7280}
     @media(max-width:720px){.qr-grid{grid-template-columns:1fr}}
-    @media print{body{background:#fff}.topbar,.qr-toolbar,.teacher-only{display:none!important}.shell{max-width:none;padding:0}.qr-grid{grid-template-columns:repeat(2,1fr);gap:10mm}.qr-card{border:1px solid #bbb;border-radius:12px;padding:10mm;min-height:120mm;display:flex;flex-direction:column;justify-content:center}.qr-url{font-size:9pt}.qr-card h2{font-size:24pt}}
+    @page{size:A4 portrait;margin:12mm}
+    @media print{
+      html,body{background:#fff!important;margin:0!important;padding:0!important}
+      .topbar,.qr-toolbar,.teacher-only,.qr-url{display:none!important}
+      .shell{max-width:none!important;width:100%!important;margin:0!important;padding:0!important}
+      .qr-grid{display:block!important;margin:0!important;padding:0!important}
+      .qr-card{
+        box-sizing:border-box!important;
+        width:100%!important;
+        height:273mm!important;
+        margin:0!important;
+        padding:18mm 12mm!important;
+        border:0!important;
+        border-radius:0!important;
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:center!important;
+        break-inside:avoid!important;
+        page-break-inside:avoid!important;
+        break-after:page!important;
+        page-break-after:always!important;
+      }
+      .qr-card:last-child{break-after:auto!important;page-break-after:auto!important}
+      .qr-order{font-size:18pt!important;margin-bottom:5mm!important;color:#555!important}
+      .qr-card h2{font-size:34pt!important;line-height:1.2!important;margin:0 0 10mm!important;color:#111!important}
+      .qr-box{margin:0!important}
+      .qr-box canvas,.qr-box img{width:95mm!important;height:95mm!important;image-rendering:pixelated!important}
+    }
   </style>
 </head>
 <body>
   <main class="shell">
     <div class="topbar"><div class="brand"><span class="brand-mark">QR</span> 包廂 QR Code</div><span class="small-note">講師用</span></div>
     <div class="qr-toolbar">
-      <div><h1 style="margin:0 0 8px">6 間包廂 QR Code</h1><div class="small-note">會使用你在講師控制台輸入的包廂名稱。</div></div>
+      <div><h1 style="margin:0 0 8px">6 間包廂 QR Code</h1><div class="small-note">會使用你在講師控制台輸入的包廂名稱。列印時每頁只會有 1 個 QR Code，共 6 頁。</div></div>
       <button class="btn primary" type="button" onclick="window.print()">列印 QR Code</button>
     </div>
     <section class="qr-grid" id="qrGrid"></section>
@@ -56,8 +84,8 @@
 
       new QRCode(document.querySelector(`#qr-${room.id}`), {
         text: url.href,
-        width: 210,
-        height: 210,
+        width: 360,
+        height: 360,
         correctLevel: QRCode.CorrectLevel.M
       });
     });
