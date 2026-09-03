@@ -6,7 +6,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>體驗回填｜情緒包廂</title>
-  <link rel="stylesheet" href="css/style.css?v=20260829-2">
+  <link rel="stylesheet" href="css/style.css?v=20260903-1">
 </head>
 <body>
   <main class="shell" style="max-width:820px">
@@ -22,16 +22,20 @@
       <div class="eyebrow">體驗完成後</div>
       <div class="room-head" id="roomHead"></div>
       <form id="emotionForm">
-        <label class="form-label">剛才最明顯的感覺是什麼？ <span class="small-note">最多 3 個詞</span></label>
+        <label class="form-label">剛才最明顯的感覺是什麼？ <span class="small-note">最多 6 個詞</span></label>
         <div class="word-row">
           <input class="input emotion-input" maxlength="12" placeholder="第一個感覺">
           <input class="input emotion-input" maxlength="12" placeholder="第二個感覺（選填）">
           <input class="input emotion-input" maxlength="12" placeholder="第三個感覺（選填）">
+          <input class="input emotion-input" maxlength="12" placeholder="第四個感覺（選填）">
+          <input class="input emotion-input" maxlength="12" placeholder="第五個感覺（選填）">
+          <input class="input emotion-input" maxlength="12" placeholder="第六個感覺（選填）">
         </div>
         <p class="small-note" style="margin-top:10px">不用猜這間包廂想讓你感受到什麼，只寫你自己真的出現的感覺。</p>
 
-        <div style="margin-top:14px">
+        <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <button class="btn soft" id="moreEmotionsBtn" type="button" aria-expanded="false" aria-controls="emotionSuggestions">更多情緒</button>
+          <span class="small-note">說不出自己的情緒感受？點開找更多靈感。</span>
         </div>
 
         <div id="emotionSuggestions" hidden style="margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.72)">
@@ -56,6 +60,6 @@
       if (event.persisted) window.location.reload();
     });
   </script>
-  <script type="module" src="js/student.js?v=20260829-2"></script>
+  <script type="module" src="js/student.js?v=20260903-1"></script>
 </body>
 </html>
