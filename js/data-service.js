@@ -1,4 +1,4 @@
-import { firebaseConfig } from './firebase-config.js?v=20260829-1';
+import { firebaseConfig } from './firebase-config.js?v=20260903-1';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
 import {
   getDatabase,
@@ -77,13 +77,21 @@ function notifySubscribers() {
 function normalizePublicWords(raw) {
   const submissions = {};
   Object.entries(raw || {}).forEach(([roomId, records]) => {
-    submissions[roomId] = Object.entries(records || {}).map(([id, item]) => ({
-      id,
-      roomId,
-      words: Array.isArray(item?.words) ? item.words : Object.values(item?.words || {}),
-      comment: '',
-      createdAt: Number(item?.createdAt || 0)
-    }));
+    const grouped = new Map();
+    Object.entries(records || {}).forEach(([id, item]) => {
+      const createdAt = Number(item?.createdAt || 0);
+      const key = `${roomId}:${createdAt}`;
+      const words = Array.isArray(item?.words) ? item.words : Object.values(item?.words || {});
+      if (!grouped.has(key)) {
+        grouped.set(key, { id, roomId, words: [], comment: '', createdAt });
+      }
+      const entry = grouped.get(key);
+      words.forEach((word) => {
+        const cleaned = String(word || '').trim();
+        if (cleaned && entry.words.length < 6 && !entry.words.includes(cleaned)) entry.words.push(cleaned);
+      });
+    });
+    submissions[roomId] = [...grouped.values()];
   });
   return submissions;
 }
@@ -128,7 +136,7 @@ function makeSubmission(roomId, payload, id = null) {
   return {
     ...(id ? { id } : {}),
     roomId,
-    words: payload.words.map((w) => w.trim()).filter(Boolean).slice(0, 3),
+    words: payload.words.map((w) => w.trim()).filter(Boolean).slice(0, 6),
     comment: (payload.comment || '').trim().slice(0, 180),
     createdAt: Date.now()
   };
@@ -202,22 +210,32 @@ export const dataService = {
       if (lockSnapshot.val() === true) throw new Error('目前已暫停投稿');
 
       const submission = makeSubmission(roomId, payload);
-      const newRef = push(ref(database, `${ROOT_PATH}/publicWords/${roomId}`));
-      const id = newRef.key;
-      if (!id) throw new Error('無法建立投稿編號，請再試一次。');
+      const chunks = [];
+      for (let i = 0; i < submission.words.length; i += 3) chunks.push(submission.words.slice(i, i + 3));
 
-      await update(ref(database, ROOT_PATH), {
-        [`publicWords/${roomId}/${id}`]: {
+      const changes = {};
+      let firstId = null;
+      chunks.forEach((words) => {
+        const newRef = push(ref(database, `${ROOT_PATH}/publicWords/${roomId}`));
+        const id = newRef.key;
+        if (!id) throw new Error('無法建立投稿編號，請再試一次。');
+        if (!firstId) firstId = id;
+        changes[`publicWords/${roomId}/${id}`] = {
           roomId,
-          words: submission.words,
+          words,
           createdAt: submission.createdAt
-        },
-        [`privateComments/${roomId}/${id}`]: {
+        };
+      });
+
+      if (firstId) {
+        changes[`privateComments/${roomId}/${firstId}`] = {
           roomId,
           comment: submission.comment,
           createdAt: submission.createdAt
-        }
-      });
+        };
+      }
+
+      await update(ref(database, ROOT_PATH), changes);
       return;
     }
 
