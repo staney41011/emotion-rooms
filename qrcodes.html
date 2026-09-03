@@ -61,7 +61,7 @@
 
     const grid = document.querySelector('#qrGrid');
     const labels = getRoomLabels(location.search);
-    const STUDENT_URL = 'https://staney41011.github.io/emotion-rooms/student.html';
+    const STUDENT_URL = new URL('student.html', location.href).href;
     const SITE_VERSION = '20260903-1';
 
     ROOMS.forEach((room) => {
