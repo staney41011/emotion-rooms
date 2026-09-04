@@ -25,6 +25,7 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
     return res.text();
   };
   const dataAvif=async(paths)=>'data:image/avif;base64,'+(await Promise.all(paths.map(fetchText))).join('');
+  const dataJpeg=async(paths)=>'data:image/jpeg;base64,'+(await Promise.all(paths.map(fetchText))).join('');
   const assetUrl=(path)=>{const u=new URL(path,base);u.searchParams.set('v',fresh);return u.href};
   try{
     const [htmlSource,helperCss,helperJs,performance,focus,hotpot,walkChat,walkPack,walkBacks,walkNotice]=await Promise.all([
@@ -33,7 +34,12 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
       fetchText('room6-characters.js'),
       dataAvif(['assets/room6/hq4/dual-performance.avif.part01.b64','assets/room6/hq4/dual-performance.avif.part02.b64']),
       dataAvif(['assets/room6/hq4/post-show-focus.avif.part01.b64','assets/room6/hq4/post-show-focus.avif.part02.b64']),
-      Promise.resolve(assetUrl('assets/room6/vegetarian-hotpot.jpg')),
+      dataJpeg([
+        'assets/room6/hq6/vegetarian-hotpot.part01.b64',
+        'assets/room6/hq6/vegetarian-hotpot.part02.b64',
+        'assets/room6/hq6/vegetarian-hotpot.part03.b64',
+        'assets/room6/hq6/vegetarian-hotpot.part04.b64'
+      ]),
       Promise.resolve(assetUrl('assets/room6/hq5/walk-chat-classroom.avif')),
       dataAvif(['assets/room6/hq5/walk-pack-bag.b64']),
       dataAvif(['assets/room6/hq5/walk-group-backs.b64']),
@@ -41,7 +47,20 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
     ]);
     let html=htmlSource
       .replace('星期日 · 8月30日','星期五 · 9月4日')
-      .replace('星期一 · 8月31日','星期六 · 9月5日');
+      .replace('星期一 · 8月31日','星期六 · 9月5日')
+      .replace(
+        "function scene3(){show(privateShell());addMsg('佳怡','明天一起吃飯嗎？',500,false,'#b66d8b');",
+        "function scene3(){show(privateShell());later(()=>{const c=document.querySelector('#chat');if(c){const x=document.createElement('div');x.className='day-divider';x.textContent='昨天';c.appendChild(x)}},120);addMsg('佳怡','明天一起吃飯嗎？',500,false,'#b66d8b');"
+      )
+      .replace(
+        "later(()=>document.querySelector('#typing')?.remove(),10600);addMsg('佳怡','抱歉，我今天臨時有事',10800,false,'#b66d8b');",
+        "later(()=>{const c=document.querySelector('#chat');if(c){const x=document.createElement('div');x.className='day-divider';x.textContent='今天';c.appendChild(x)}},7000);later(()=>document.querySelector('#typing')?.remove(),10600);addMsg('佳怡','抱歉，我今天臨時有事',10800,false,'#b66d8b');"
+      )
+      .replace('<div class="walk-card-overlay">18:12　教室門口</div>','<div class="walk-card-overlay">今天 18:12　教室門口</div>')
+      .replace(
+        "addNotice('系','系統','電量剩餘 31%',15700);",
+        "addNotice('系','系統','電量剩餘 31%',15700);addNotice('群','朋友們','@你　剩你還沒交報告，大家都在等你了',18400);"
+      );
     const photo=(src,cls='room6-native-img')=>`<img class="${cls}" src="${src}" alt="" loading="eager" decoding="async">`;
     html=html.replace('<div class="party-table"></div>',`<div class="party-table room6-native-photo">${photo(hotpot)}</div>`);
     html=html.replace('<div class="perform-stage">',`<div class="perform-stage room6-native-photo">${photo(performance)}`);
@@ -58,11 +77,13 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
       .story-screen .party-table.room6-native-photo:before{display:none!important}
       .story-screen .party-table.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
       .story-screen .story-head,.story-screen .story-progress,.story-screen .story-text,.story-screen .story-nav{z-index:8!important}
+      .day-divider{display:flex!important;align-items:center!important;gap:10px!important;color:#8b9299!important;font-size:.74rem!important;font-weight:850!important;letter-spacing:.08em!important;margin:8px 4px 6px!important;opacity:1!important;transform:none!important;animation:none!important}
+      .day-divider:before,.day-divider:after{content:'';height:1px;flex:1;background:#d5d9df}
       .perform-stage.room6-native-photo{width:min(430px,88vw)!important;height:min(764px,82vh)!important;aspect-ratio:800/1421!important;border-radius:26px!important;background:#090b0e!important;box-shadow:0 28px 80px rgba(0,0,0,.55)!important}
       .perform-stage.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
       .perform-stage.room6-native-photo .spot,.perform-stage.room6-native-photo .performers{display:none!important}
-      .perform-stage.room6-native-photo:before{content:'你';left:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
-      .perform-stage.room6-native-photo:after{content:'阿哲';right:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
+      .perform-stage.room6-native-photo:before{content:'阿哲';left:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
+      .perform-stage.room6-native-photo:after{content:'你';right:18%;position:absolute;bottom:18px;z-index:8;padding:7px 14px;border-radius:999px;background:rgba(8,10,14,.72);color:#fff;font-weight:900}
       .stage-mini.room6-native-photo{height:66%!important;width:auto!important;aspect-ratio:800/1421!important;background:#090b0e!important;border-radius:18px!important}
       .stage-mini.room6-native-photo .room6-native-img{object-fit:contain!important;object-position:center!important}
       .stage-mini.room6-native-photo:before,.stage-mini.room6-native-photo .mini-performer{display:none!important}
@@ -72,8 +93,8 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
       .walk-photo,.walk-photo.show{transform:none!important;background:#090b0e!important}
       .walk-photo .room6-walk-img{object-fit:cover!important;object-position:center!important;transform:none!important}
       .walk-photo.show .room6-walk-img{transform:none!important}
-      .walk-card-overlay{font-size:.78rem!important;padding:7px 10px!important}
-      @media(max-width:600px){.perform-stage.room6-native-photo{width:min(400px,91vw)!important;height:min(710px,78vh)!important}.walk-wrap{width:min(640px,94vw)!important}}
+      .walk-card-overlay{font-size:1rem!important;font-weight:950!important;padding:10px 14px!important;background:rgba(9,13,18,.82)!important;color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;box-shadow:0 8px 28px rgba(0,0,0,.35)!important;text-shadow:0 1px 4px rgba(0,0,0,.7)!important;backdrop-filter:blur(8px)!important}
+      @media(max-width:600px){.perform-stage.room6-native-photo{width:min(400px,91vw)!important;height:min(710px,78vh)!important}.walk-wrap{width:min(640px,94vw)!important}.walk-card-overlay{font-size:.92rem!important;left:14px!important;top:14px!important}}
     `;
     html=html.replace('</head>',`<style id="room6-local-css">${helperCss}\n${directCss}</style></head>`);
     const safeHelperJs=helperJs.replace(/<\/script/gi,'<\\/script');
