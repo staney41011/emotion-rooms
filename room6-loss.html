@@ -27,10 +27,11 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
   const dataAvif=async(paths)=>'data:image/avif;base64,'+(await Promise.all(paths.map(fetchText))).join('');
   const assetUrl=(path)=>{const u=new URL(path,base);u.searchParams.set('v',fresh);return u.href};
   try{
-    const [htmlSource,helperCss,helperJs,performance,focus,hotpot,walkChat,walkPack,walkBacks,walkNotice]=await Promise.all([
+    const [htmlSource,helperCss,helperJs,soundtrackJs,performance,focus,hotpot,walkChat,walkPack,walkBacks,walkNotice]=await Promise.all([
       fetchText('experience-room6-content.html'),
       fetchText('room6-characters.css'),
       fetchText('room6-characters.js'),
+      fetchText('room6-soundtrack.js'),
       dataAvif(['assets/room6/hq4/dual-performance.avif.part01.b64','assets/room6/hq4/dual-performance.avif.part02.b64']),
       dataAvif(['assets/room6/hq4/post-show-focus.avif.part01.b64','assets/room6/hq4/post-show-focus.avif.part02.b64']),
       Promise.resolve(assetUrl('assets/room6/vegetarian-hotpot.jpg')),
@@ -96,7 +97,8 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
     `;
     html=html.replace('</head>',`<style id="room6-local-css">${helperCss}\n${directCss}</style></head>`);
     const safeHelperJs=helperJs.replace(/<\/script/gi,'<\\/script');
-    html=html.replace('</body>',`<script id="room6-local-js">${safeHelperJs}<\/script></body>`);
+    const safeSoundtrackJs=soundtrackJs.replace(/<\/script/gi,'<\\/script');
+    html=html.replace('</body>',`<script id="room6-local-js">${safeHelperJs}<\/script><script id="room6-soundtrack-js">${safeSoundtrackJs}<\/script></body>`);
     document.open();document.write(html);document.close();
   }catch(error){
     console.error(error);
