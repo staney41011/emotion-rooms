@@ -25,7 +25,6 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
     return res.text();
   };
   const dataAvif=async(paths)=>'data:image/avif;base64,'+(await Promise.all(paths.map(fetchText))).join('');
-  const dataJpeg=async(paths)=>'data:image/jpeg;base64,'+(await Promise.all(paths.map(fetchText))).join('');
   const assetUrl=(path)=>{const u=new URL(path,base);u.searchParams.set('v',fresh);return u.href};
   try{
     const [htmlSource,helperCss,helperJs,performance,focus,hotpot,walkChat,walkPack,walkBacks,walkNotice]=await Promise.all([
@@ -34,12 +33,7 @@ html,body{margin:0;width:100%;height:100%;background:#050607;color:#e8edf2;font-
       fetchText('room6-characters.js'),
       dataAvif(['assets/room6/hq4/dual-performance.avif.part01.b64','assets/room6/hq4/dual-performance.avif.part02.b64']),
       dataAvif(['assets/room6/hq4/post-show-focus.avif.part01.b64','assets/room6/hq4/post-show-focus.avif.part02.b64']),
-      dataJpeg([
-        'assets/room6/hq6/vegetarian-hotpot.part01.b64',
-        'assets/room6/hq6/vegetarian-hotpot.part02.b64',
-        'assets/room6/hq6/vegetarian-hotpot.part03.b64',
-        'assets/room6/hq6/vegetarian-hotpot.part04.b64'
-      ]),
+      Promise.resolve(assetUrl('assets/room6/vegetarian-hotpot.jpg')),
       Promise.resolve(assetUrl('assets/room6/hq5/walk-chat-classroom.avif')),
       dataAvif(['assets/room6/hq5/walk-pack-bag.b64']),
       dataAvif(['assets/room6/hq5/walk-group-backs.b64']),
