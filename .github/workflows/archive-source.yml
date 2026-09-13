@@ -1,0 +1,31 @@
+name: Archive source snapshot
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/archive-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build source archive
+        run: |
+          zip -r emotion-rooms-source-${GITHUB_SHA}.zip . -x '.git/*'
+
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: emotion-rooms-source-${{ github.sha }}
+          path: emotion-rooms-source-${{ github.sha }}.zip
+          if-no-files-found: error
+          retention-days: 90
